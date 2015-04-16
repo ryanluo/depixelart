@@ -336,7 +336,7 @@ void process_func (int value)
 		}
 
 	case M_PROCESS_FUN_WARP:  // enum #16
-		resultImage = ip_fun_warp(currentImage,samplingMode);
+		//resultImage = ip_fun_warp(currentImage,samplingMode);
 		break;
 
 	case M_PROCESS_GREY: // enum #17

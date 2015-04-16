@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>FB094389-03B4-4B8D-9F88-D4C37AED71D4</string>
+	<key>IDESourceControlProjectName</key>
+	<string>ip2015</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>B59FDDD52BC108AF146D3BA059105A0C87547E12</key>
+		<string>https://github.com/ryanluo/depixelart.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>ip2015skeleton/ip2015.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>B59FDDD52BC108AF146D3BA059105A0C87547E12</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/ryanluo/depixelart.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>B59FDDD52BC108AF146D3BA059105A0C87547E12</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B59FDDD52BC108AF146D3BA059105A0C87547E12</string>
+			<key>IDESourceControlWCCName</key>
+			<string>depixelart</string>
+		</dict>
+	</array>
+</dict>
+</plist>
