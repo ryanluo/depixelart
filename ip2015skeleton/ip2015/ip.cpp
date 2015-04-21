@@ -209,7 +209,7 @@ bool* checkNeighbors(int x, int y, Image &src){
 
 /*
  * define your own filter
- * you need to request any input paraters here, not in control.cpp
+ * you need to request any input parameters here, not in control.cpp
  */
 
 Image* ip_misc(Image* src)
@@ -251,17 +251,16 @@ Image* ip_misc(Image* src)
     for (int i = 0; i < blockSize; ++i) {
         for (int j = 0; j < blockSize; ++j) {
             similarityGraph[i*blockSize + j] = checkNeighbors(i, j, *rawGraph);
-            for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
+            for (int k = 0; k < 8; ++k) cout << checkNeighbors(i, j, *rawGraph)[k] << ",";
             cout << endl;
-
         }
     }
     
     
     for (int i = 0; i < blockSize; ++i) {
         for (int j = 0; j < blockSize; ++j) {
-            for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
-            cout << endl;
+            //for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
+            //cout << endl;
         }
     }
     
