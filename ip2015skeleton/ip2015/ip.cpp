@@ -174,13 +174,12 @@ bool comparePixel(Pixel &pix1, Pixel &pix2){
     return similar;
 }
 
-bool* checkNeighbors(int x, int y, Image &src){
+void checkNeighbors(int x, int y, Image &src, bool* neighbors){
     int srcWidth = src.getWidth();
     int srcHeight = src.getHeight();
     
     Pixel pix = src.getPixel(x, y);
     Pixel pixN;
-    bool neighbors[8];
     for(int i = 0; i<8; ++i){
         neighbors[i] = 0;
     }
@@ -203,7 +202,6 @@ bool* checkNeighbors(int x, int y, Image &src){
     }
     if(y > 0) neighbors[1] = comparePixel(pix, src.getPixel(x, y-1, pixN));
     if(y < srcHeight -1) neighbors[6] = comparePixel(pix, src.getPixel(x, y+1, pixN));
-    return neighbors;
 }
 
 
@@ -241,19 +239,17 @@ Image* ip_misc(Image* src)
             }
             for (int k = 0; k < 3; ++k) outputData[k] /= (blockSize * blockSize);
             for (int k = 0; k < 3; ++k) outputPixel.setColor(k, outputData[k]);
-            rawGraph->setPixel(i, j, outputPixel);
+            Pixel p(0,0,0);
+            rawGraph->setPixel(i, j, p);
         }
     }
     
-    bool* similarityGraph[400];
+    bool similarityGraph[400][8];
     
     int pixelIndex = 0;
     for (int i = 0; i < blockSize; ++i) {
         for (int j = 0; j < blockSize; ++j) {
-            similarityGraph[i*blockSize + j] = checkNeighbors(i, j, *rawGraph);
-            for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
-            cout << endl;
-
+            checkNeighbors(j, i, *rawGraph, similarityGraph[i*blockSize + j]);
         }
     }
     
