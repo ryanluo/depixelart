@@ -2,7 +2,7 @@
 #include "main.h"
 #include <algorithm>
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include <time.h>
 
 
@@ -170,7 +170,7 @@ Image* ip_invert (Image* src)
 }
 bool comparePixel(Pixel &pix1, Pixel &pix2){
     bool similar = true;
-    for (int i = 0; i < 3; ++i) similar &= pix1.getColor(i) == pix2.getColor(i);
+    for (int i = 0; i < 3; ++i) similar &= (abs(pix1.getColor(i) - pix2.getColor(i)) < .05);
     return similar;
 }
 
