@@ -239,33 +239,21 @@ Image* ip_misc(Image* src)
             }
             for (int k = 0; k < 3; ++k) outputData[k] /= (blockSize * blockSize);
             for (int k = 0; k < 3; ++k) outputPixel.setColor(k, outputData[k]);
-            Pixel p(0,0,0);
-            rawGraph->setPixel(i, j, p);
+            rawGraph->setPixel(i, j, outputPixel);
         }
     }
     
     bool similarityGraph[400][8];
     
-    int pixelIndex = 0;
     for (int i = 0; i < blockSize; ++i) {
         for (int j = 0; j < blockSize; ++j) {
             checkNeighbors(j, i, *rawGraph, similarityGraph[i*blockSize + j]);
         }
     }
     
-    
-    for (int i = 0; i < blockSize; ++i) {
-        for (int j = 0; j < blockSize; ++j) {
-            for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
-            cout << endl;
-        }
-    }
-    
-    
     Image* rawGraphTest = new Image(blockSize*blockSize, blockSize*blockSize, 3);
     
     Pixel rawPixel;
-    
     for(int i=0; i<blockSize; ++i){
         for(int j=0; j<blockSize; ++j){
             rawPixel = rawGraph->getPixel(i, j);
