@@ -204,28 +204,55 @@ void checkNeighbors(int x, int y, Image &src, bool* neighbors){
     if(y < srcHeight -1) neighbors[6] = comparePixel(pix, src.getPixel(x, y+1, pixN));
 }
 
+void drawDiag(int startX, int startY, int endX, int endY, Image &src){
+    Pixel black(0,0,0);
+    if(endX > startX){
+        if(endY > startY){
+            for(int i = 0; i < endX - startX; i++){
+                src.setPixel(startX+i, startY+i, black);
+            }
+        }else{
+            for(int i = 0; i<endX - startX; i++){
+                src.setPixel(startX+i, startY-i, black);
+            }
+        }
+    }else{
+        if(endY > startY){
+            for(int i = 0; i < endX - startX; i++){
+                src.setPixel(startX-i, startY+i, black);
+            }
+        }else{
+            for(int i = 0; i<endX - startX; i++){
+                src.setPixel(startX-i, startY-i, black);
+            }
+        }
+    }
+}
+
 
 /*
  * define your own filter
- * you need to request any input paraters here, not in control.cpp
+ * you need to request any input parameters here, not in control.cpp
  */
 
 Image* ip_misc(Image* src)
 {
     //cerr << "This function is not implemented." << endl;
+    int blockSizeHeight = 16;
+    int blockSizeWidth = 40;
     int blockSize = 20;
     int srcWidth = src->getWidth();
     int srcHeight = src->getHeight();
-    Image* rawGraph = new Image(blockSize, blockSize, 8);
+    Image* rawGraph = new Image(blockSizeWidth, blockSizeHeight, 8);
     
     Pixel srcPixel;
     
-    int blockWidth = srcWidth / blockSize;
-    int blockHeight = srcHeight / blockSize;
+    int blockWidth = srcWidth / blockSizeWidth;
+    int blockHeight = srcHeight / blockSizeHeight;
     
     
-    for(int i = 0; i<blockSize; i++){
-        for(int j=0; j<blockSize; j++){
+    for(int i = 0; i<blockSizeWidth; i++){
+        for(int j=0; j<blockSizeHeight; j++){
             Pixel outputPixel(0,0,0);
             float outputData[] = {0., 0., 0.};
             int blockEndi = blockWidth * i + blockWidth;
@@ -237,28 +264,42 @@ Image* ip_misc(Image* src)
                     for (int k = 0; k < 3; ++k) outputData[k] += src->getPixel(x, y, k);
                 }
             }
-            for (int k = 0; k < 3; ++k) outputData[k] /= (blockSize * blockSize);
+            for (int k = 0; k < 3; ++k) outputData[k] /= (blockSizeWidth * blockSizeHeight);
             for (int k = 0; k < 3; ++k) outputPixel.setColor(k, outputData[k]);
             rawGraph->setPixel(i, j, outputPixel);
         }
     }
     
-    bool similarityGraph[400][8];
+    bool similarityGraph[640][8];
     
-    for (int i = 0; i < blockSize; ++i) {
-        for (int j = 0; j < blockSize; ++j) {
-            checkNeighbors(j, i, *rawGraph, similarityGraph[i*blockSize + j]);
+    int pixelIndex = 0;
+    for (int i = 0; i < blockSizeWidth; ++i) {
+        for (int j = 0; j < blockSizeHeight; ++j) {
+            checkNeighbors(j, i, *rawGraph, similarityGraph[i*blockSizeWidth + j]);
         }
     }
     
-    Image* rawGraphTest = new Image(blockSize*blockSize, blockSize*blockSize, 3);
+    
+    for (int i = 0; i < blockSizeWidth; ++i) {
+        for (int j = 0; j < blockSizeHeight; ++j) {
+            //for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
+            //cout << endl;
+        }
+    }
+    
+    int pixelSize = 15;
+    
+    Image* rawGraphTest = new Image(blockSizeWidth*pixelSize, blockSizeHeight*pixelSize, 3);
     
     Pixel rawPixel;
-    for(int i=0; i<blockSize; ++i){
-        for(int j=0; j<blockSize; ++j){
+    
+    
+    
+    for(int i=0; i<blockSizeWidth; ++i){
+        for(int j=0; j<blockSizeHeight; ++j){
             rawPixel = rawGraph->getPixel(i, j);
-            for(int x = i*blockSize; x < i*blockSize+blockSize; ++x){
-                for(int y = j * blockSize; y < j*blockSize + blockSize; ++y){
+            for(int x = i*pixelSize; x < i*pixelSize+pixelSize; ++x){
+                for(int y = j * pixelSize; y < j*pixelSize + pixelSize; ++y){
                     rawGraphTest->setPixel(x, y, rawPixel);
                 }
             }
