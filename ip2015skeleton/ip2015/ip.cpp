@@ -174,34 +174,34 @@ bool comparePixel(Pixel &pix1, Pixel &pix2){
     return similar;
 }
 
-void checkNeighbors(int x, int y, Image &src, bool* neighbors){
+void checkNeighbors(int x, int y, Image &src, vector<bool>* neighbors){
     int srcWidth = src.getWidth();
     int srcHeight = src.getHeight();
     
     Pixel pix = src.getPixel(x, y);
     Pixel pixN;
-    for(int i = 0; i<8; ++i){
-        neighbors[i] = 0;
-    }
+    
     if(x > 0){
         if (y > 0) {
             pixN = src.getPixel(x-1,y-1);
-            neighbors[0] = comparePixel(pix,pixN);
+            neighbors->at(0) = comparePixel(pix,pixN);
         }
         pixN = src.getPixel(x-1,y);
-        neighbors[3] = comparePixel(pix, pixN);
+        neighbors->at(3) = comparePixel(pix, pixN);
         if (y < srcHeight - 1) {
             pixN = src.getPixel(x-1,y+1);
-            neighbors[5] = comparePixel(pix, pixN);
+            neighbors->at(5) = comparePixel(pix, pixN);
         }
     }
     if (x < srcWidth - 1) {
-        if (y > 0) neighbors[2] = comparePixel(pix, src.getPixel(x+1, y-1, pixN));
-        neighbors[4] = comparePixel(pix, src.getPixel(x+1, y, pixN));
-        if (y < srcHeight - 1) neighbors[7] = comparePixel(pix, src.getPixel(x+1, y+1, pixN));
+        if (y > 0) neighbors->at(2) = comparePixel(pix, src.getPixel(x+1, y-1, pixN));
+        neighbors->at(4) = comparePixel(pix, src.getPixel(x+1, y, pixN));
+        if (y < srcHeight - 1) neighbors->at(7) = comparePixel(pix, src.getPixel(x+1, y+1, pixN));
     }
-    if(y > 0) neighbors[1] = comparePixel(pix, src.getPixel(x, y-1, pixN));
-    if(y < srcHeight -1) neighbors[6] = comparePixel(pix, src.getPixel(x, y+1, pixN));
+    if(y > 0) neighbors->at(1) = comparePixel(pix, src.getPixel(x, y-1, pixN));
+    if(y < srcHeight -1) neighbors->at(6) = comparePixel(pix, src.getPixel(x, y+1, pixN));
+     
+    
 }
 
 void drawDiag(int startX, int startY, int endX, int endY, Image &src){
@@ -238,21 +238,20 @@ void drawDiag(int startX, int startY, int endX, int endY, Image &src){
 Image* ip_misc(Image* src)
 {
     //cerr << "This function is not implemented." << endl;
-    int blockSizeHeight = 16;
-    int blockSizeWidth = 40;
-    int blockSize = 20;
+    int blockSizeY = 16;
+    int blockSizeX = 40;
+
     int srcWidth = src->getWidth();
     int srcHeight = src->getHeight();
-    Image* rawGraph = new Image(blockSizeWidth, blockSizeHeight, 8);
+    Image* rawGraph = new Image(blockSizeX, blockSizeY, 8);
     
     Pixel srcPixel;
     
-    int blockWidth = srcWidth / blockSizeWidth;
-    int blockHeight = srcHeight / blockSizeHeight;
+    int blockWidth = srcWidth / blockSizeX;
+    int blockHeight = srcHeight / blockSizeY;
     
-    
-    for(int i = 0; i<blockSizeWidth; i++){
-        for(int j=0; j<blockSizeHeight; j++){
+    for(int i = 0; i<blockSizeX; i++){
+        for(int j=0; j<blockSizeY; j++){
             Pixel outputPixel(0,0,0);
             float outputData[] = {0., 0., 0.};
             int blockEndi = blockWidth * i + blockWidth;
@@ -264,39 +263,36 @@ Image* ip_misc(Image* src)
                     for (int k = 0; k < 3; ++k) outputData[k] += src->getPixel(x, y, k);
                 }
             }
-            for (int k = 0; k < 3; ++k) outputData[k] /= (blockSizeWidth * blockSizeHeight);
+            for (int k = 0; k < 3; ++k) outputData[k] /= (blockSizeX * blockSizeY);
             for (int k = 0; k < 3; ++k) outputPixel.setColor(k, outputData[k]);
             rawGraph->setPixel(i, j, outputPixel);
         }
     }
     
-    bool similarityGraph[640][8];
+    vector<vector <bool> > similarityGraph(640, vector<bool>(8,false));
     
-    int pixelIndex = 0;
-    for (int i = 0; i < blockSizeWidth; ++i) {
-        for (int j = 0; j < blockSizeHeight; ++j) {
-            checkNeighbors(j, i, *rawGraph, similarityGraph[i*blockSizeWidth + j]);
+    for (int i = 0; i < blockSizeX; ++i) {
+        for (int j = 0; j < blockSizeY; ++j) {
+            checkNeighbors(i, j, *rawGraph, &similarityGraph[i*blockSizeY + j]);
         }
     }
     
     
-    for (int i = 0; i < blockSizeWidth; ++i) {
-        for (int j = 0; j < blockSizeHeight; ++j) {
-            //for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
-            //cout << endl;
+    for (int i = 0; i < blockSizeX; ++i) {
+        for (int j = 0; j < blockSizeY; ++j) {
+            for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSizeY + j][k] << ",";
+            cout << endl;
         }
     }
     
     int pixelSize = 15;
     
-    Image* rawGraphTest = new Image(blockSizeWidth*pixelSize, blockSizeHeight*pixelSize, 3);
+    Image* rawGraphTest = new Image(blockSizeX*pixelSize, blockSizeY*pixelSize, 3);
     
-    Pixel rawPixel;
+    Pixel rawPixel(0,0,0);
     
-    
-    
-    for(int i=0; i<blockSizeWidth; ++i){
-        for(int j=0; j<blockSizeHeight; ++j){
+    for(int i=0; i<blockSizeX; ++i){
+        for(int j=0; j<blockSizeY; ++j){
             rawPixel = rawGraph->getPixel(i, j);
             for(int x = i*pixelSize; x < i*pixelSize+pixelSize; ++x){
                 for(int y = j * pixelSize; y < j*pixelSize + pixelSize; ++y){
@@ -305,13 +301,8 @@ Image* ip_misc(Image* src)
             }
         }
     }
-    
-    
-    
-    
     return rawGraphTest;
 }
-
 
 
 
