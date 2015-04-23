@@ -266,8 +266,7 @@ Image* ip_misc(Image* src)
             }
             for (int k = 0; k < 3; ++k) outputData[k] /= (blockSizeWidth * blockSizeHeight);
             for (int k = 0; k < 3; ++k) outputPixel.setColor(k, outputData[k]);
-            Pixel p(0,0,0);
-            rawGraph->setPixel(i, j, p);
+            rawGraph->setPixel(i, j, outputPixel);
         }
     }
     
