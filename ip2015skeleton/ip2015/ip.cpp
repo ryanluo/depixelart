@@ -229,6 +229,108 @@ void drawEdge(int startX, int startY, int endX, int endY, Image &src){
     }
 }
 
+void drawLine(int startX, int startY, int endX, int endY, int blockSize, Image &src){
+    bool xChanges = startX != endX;
+    bool yChanges = startY != endY;
+    Pixel red(1,0,0);
+    if(xChanges){
+        if(yChanges){
+            if(endX > startX){
+                if(endY > startY){
+                    for(int i = 0; i < endX - startX; i++){
+                        src.setPixel(startX+i, startY+i, red);
+                    }
+                }else{
+                    for(int i = 0; i<endX - startX; i++){
+                        src.setPixel(startX+i, startY-i, red);
+                    }
+                }
+            }else{
+                if(endY > startY){
+                    for(int i = 0; i < endX - startX; i++){
+                        src.setPixel(startX-i, startY+i, red);
+                    }
+                }else{
+                    for(int i = 0; i<endX - startX; i++){
+                        src.setPixel(startX-i, startY-i, red);
+                    }
+                }
+            }
+        }else{
+            int i = min(startX, endX);
+            int bigI = max(startX, endX);
+            int j = startY;
+            while(i <= bigI){
+                src.setPixel(i, j, red);
+                i++;
+            }
+        }
+    }else if(yChanges){
+        int j = min(startY, endY);
+        int bigJ = max(startY, endY);
+        int i = startX;
+        while(j <= bigJ){
+            src.setPixel(i, j, red);
+            j++;
+        }
+    }
+}
+
+
+void drawEdge(int startX, int startY, int endX, int endY, int blockSize, Image &src){
+    int startCenterX = startX*blockSize + blockSize/2;
+    int startCenterY = startY*blockSize + blockSize/2;
+    int endCenterY = endY*blockSize + blockSize/2;
+    int endCenterX = endX*blockSize + blockSize/2;
+    drawLine(startCenterX,startCenterY,endCenterX,endCenterY,blockSize,src);
+}
+
+void getNeighbor(int startX, int startY, int* neighborX, int* neighborY, int index){
+    switch(index){
+        case 0: {
+            *neighborX = startX-1;
+            *neighborY = startY-1;
+            break;
+        }
+        case 1: {
+            *neighborX = startX;
+            *neighborY = startY-1;
+            break;
+        }
+        case 2: {
+            *neighborX = startX+1;
+            *neighborY = startY-1;
+            break;
+        }
+        case 3: {
+            *neighborX = startX-1;
+            *neighborY = startY;
+            break;
+        }
+        case 4: {
+            *neighborX = startX+1;
+            *neighborY = startY;
+            break;
+        }
+        case 5: {
+            *neighborX = startX-1;
+            *neighborY = startY+1;
+            break;
+        }
+        case 6: {
+            *neighborX = startX;
+            *neighborY = startY+1;
+            break;
+        }
+        case 7: {
+            *neighborX = startX+1;
+            *neighborY = startY+1;
+            break;
+        }
+    }
+}
+
+
 
 /*
  * define your own filter
@@ -301,6 +403,20 @@ Image* ip_misc(Image* src)
             }
         }
     }
+    
+    for(int x = 0; x<blockSizeX; ++x){
+        for(int y = 0; y<blockSizeY; ++y){
+            for(int k = 0; k<8; ++k){
+                if(similarityGraph[x*blockSizeY+y][k]){
+                    int endX = x;
+                    int endY = y;
+                    getNeighbor(x, y, &endX, &endY, k);
+                    drawEdge(x, y, endX, endY, pixelSize, *rawGraphTest);
+                }
+            }
+        }
+    }
+    
     return rawGraphTest;
 }
 
