@@ -204,7 +204,7 @@ void checkNeighbors(int x, int y, Image &src, vector<bool>* neighbors){
     
 }
 
-void drawDiag(int startX, int startY, int endX, int endY, Image &src){
+void drawEdge(int startX, int startY, int endX, int endY, Image &src){
     Pixel black(0,0,0);
     if(endX > startX){
         if(endY > startY){
