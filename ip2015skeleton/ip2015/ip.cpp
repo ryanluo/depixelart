@@ -330,7 +330,25 @@ void getNeighbor(int startX, int startY, int* neighborX, int* neighborY, int ind
     }
 }
 
-
+// Pixel at i,j represents left corner of 2x2 block to check
+void checkRedundancy(int i,
+                     int j,
+                     int blockSizeX,
+                     int blockSizeY,
+                     vector< vector<bool> > * similarityGraph) {
+    vector<bool> adjList = similarityGraph->at(i*blockSizeY + j);
+    bool upperLeft = adjList[4] && adjList[6] && adjList[7];
+    adjList = similarityGraph->at(i*blockSizeY + j + 1);
+    bool bottomLeft = adjList[2] && adjList[4];
+    adjList = similarityGraph->at((i+1)*blockSizeY + j + 1);
+    bool bottomRight = adjList[1];
+    if (upperLeft && bottomRight && bottomLeft) {
+        similarityGraph->at(i*blockSizeY + j)[7] = false;
+        similarityGraph->at((i+1)*blockSizeY + j+1)[0] = false;
+        similarityGraph->at(i*blockSizeY + j+1)[2] = false;
+        similarityGraph->at((i+1)*blockSizeY + j)[5] = false;
+    }
+}
 
 /*
  * define your own filter
@@ -355,23 +373,18 @@ Image* ip_misc(Image* src)
     for(int i = 0; i<blockSizeX; i++){
         for(int j=0; j<blockSizeY; j++){
             Pixel outputPixel(0,0,0);
-            float outputData[] = {0., 0., 0.};
             int blockEndi = blockWidth * i + blockWidth;
             int blockEndj = blockHeight * j + blockHeight;
             blockEndi = min(blockEndi, srcWidth);
             blockEndj = min(blockEndj, srcHeight);
-            for(int x = blockWidth * i; x<blockEndi; x++){
-                for(int y = blockHeight * j; y<blockEndj; y++){
-                    for (int k = 0; k < 3; ++k) outputData[k] += src->getPixel(x, y, k);
-                }
-            }
-            for (int k = 0; k < 3; ++k) outputData[k] /= (blockSizeX * blockSizeY);
-            for (int k = 0; k < 3; ++k) outputPixel.setColor(k, outputData[k]);
+            outputPixel =
+              src->getPixel(i * blockWidth + blockWidth / 2, j * blockHeight + blockHeight / 2);
+            
             rawGraph->setPixel(i, j, outputPixel);
         }
     }
     
-    vector<vector <bool> > similarityGraph(640, vector<bool>(8,false));
+    vector<vector <bool> > similarityGraph(blockSizeX * blockSizeY, vector<bool>(8,false));
     
     for (int i = 0; i < blockSizeX; ++i) {
         for (int j = 0; j < blockSizeY; ++j) {
@@ -401,6 +414,12 @@ Image* ip_misc(Image* src)
                     rawGraphTest->setPixel(x, y, rawPixel);
                 }
             }
+        }
+    }
+    
+    for (int i = 0; i < blockSizeX - 1; ++i) {
+        for (int j = 0; j < blockSizeY - 1; ++j) {
+            checkRedundancy(i,j,blockSizeX, blockSizeY, &similarityGraph);
         }
     }
     
