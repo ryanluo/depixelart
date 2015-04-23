@@ -174,13 +174,12 @@ bool comparePixel(Pixel &pix1, Pixel &pix2){
     return similar;
 }
 
-bool* checkNeighbors(int x, int y, Image &src){
+void checkNeighbors(int x, int y, Image &src, bool* neighbors){
     int srcWidth = src.getWidth();
     int srcHeight = src.getHeight();
     
     Pixel pix = src.getPixel(x, y);
     Pixel pixN;
-    bool neighbors[8];
     for(int i = 0; i<8; ++i){
         neighbors[i] = 0;
     }
@@ -203,7 +202,31 @@ bool* checkNeighbors(int x, int y, Image &src){
     }
     if(y > 0) neighbors[1] = comparePixel(pix, src.getPixel(x, y-1, pixN));
     if(y < srcHeight -1) neighbors[6] = comparePixel(pix, src.getPixel(x, y+1, pixN));
-    return neighbors;
+}
+
+void drawDiag(int startX, int startY, int endX, int endY, Image &src){
+    Pixel black(0,0,0);
+    if(endX > startX){
+        if(endY > startY){
+            for(int i = 0; i < endX - startX; i++){
+                src.setPixel(startX+i, startY+i, black);
+            }
+        }else{
+            for(int i = 0; i<endX - startX; i++){
+                src.setPixel(startX+i, startY-i, black);
+            }
+        }
+    }else{
+        if(endY > startY){
+            for(int i = 0; i < endX - startX; i++){
+                src.setPixel(startX-i, startY+i, black);
+            }
+        }else{
+            for(int i = 0; i<endX - startX; i++){
+                src.setPixel(startX-i, startY-i, black);
+            }
+        }
+    }
 }
 
 
@@ -215,19 +238,21 @@ bool* checkNeighbors(int x, int y, Image &src){
 Image* ip_misc(Image* src)
 {
     //cerr << "This function is not implemented." << endl;
+    int blockSizeHeight = 16;
+    int blockSizeWidth = 40;
     int blockSize = 20;
     int srcWidth = src->getWidth();
     int srcHeight = src->getHeight();
-    Image* rawGraph = new Image(blockSize, blockSize, 8);
+    Image* rawGraph = new Image(blockSizeWidth, blockSizeHeight, 8);
     
     Pixel srcPixel;
     
-    int blockWidth = srcWidth / blockSize;
-    int blockHeight = srcHeight / blockSize;
+    int blockWidth = srcWidth / blockSizeWidth;
+    int blockHeight = srcHeight / blockSizeHeight;
     
     
-    for(int i = 0; i<blockSize; i++){
-        for(int j=0; j<blockSize; j++){
+    for(int i = 0; i<blockSizeWidth; i++){
+        for(int j=0; j<blockSizeHeight; j++){
             Pixel outputPixel(0,0,0);
             float outputData[] = {0., 0., 0.};
             int blockEndi = blockWidth * i + blockWidth;
@@ -239,41 +264,43 @@ Image* ip_misc(Image* src)
                     for (int k = 0; k < 3; ++k) outputData[k] += src->getPixel(x, y, k);
                 }
             }
-            for (int k = 0; k < 3; ++k) outputData[k] /= (blockSize * blockSize);
+            for (int k = 0; k < 3; ++k) outputData[k] /= (blockSizeWidth * blockSizeHeight);
             for (int k = 0; k < 3; ++k) outputPixel.setColor(k, outputData[k]);
-            rawGraph->setPixel(i, j, outputPixel);
+            Pixel p(0,0,0);
+            rawGraph->setPixel(i, j, p);
         }
     }
     
-    bool* similarityGraph[400];
+    bool similarityGraph[640][8];
     
     int pixelIndex = 0;
-    for (int i = 0; i < blockSize; ++i) {
-        for (int j = 0; j < blockSize; ++j) {
-            similarityGraph[i*blockSize + j] = checkNeighbors(i, j, *rawGraph);
-            for (int k = 0; k < 8; ++k) cout << checkNeighbors(i, j, *rawGraph)[k] << ",";
-            cout << endl;
+    for (int i = 0; i < blockSizeWidth; ++i) {
+        for (int j = 0; j < blockSizeHeight; ++j) {
+            checkNeighbors(j, i, *rawGraph, similarityGraph[i*blockSizeWidth + j]);
         }
     }
     
     
-    for (int i = 0; i < blockSize; ++i) {
-        for (int j = 0; j < blockSize; ++j) {
+    for (int i = 0; i < blockSizeWidth; ++i) {
+        for (int j = 0; j < blockSizeHeight; ++j) {
             //for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSize + j][k] << ",";
             //cout << endl;
         }
     }
     
+    int pixelSize = 15;
     
-    Image* rawGraphTest = new Image(blockSize*blockSize, blockSize*blockSize, 3);
+    Image* rawGraphTest = new Image(blockSizeWidth*pixelSize, blockSizeHeight*pixelSize, 3);
     
     Pixel rawPixel;
     
-    for(int i=0; i<blockSize; ++i){
-        for(int j=0; j<blockSize; ++j){
+    
+    
+    for(int i=0; i<blockSizeWidth; ++i){
+        for(int j=0; j<blockSizeHeight; ++j){
             rawPixel = rawGraph->getPixel(i, j);
-            for(int x = i*blockSize; x < i*blockSize+blockSize; ++x){
-                for(int y = j * blockSize; y < j*blockSize + blockSize; ++y){
+            for(int x = i*pixelSize; x < i*pixelSize+pixelSize; ++x){
+                for(int y = j * pixelSize; y < j*pixelSize + pixelSize; ++y){
                     rawGraphTest->setPixel(x, y, rawPixel);
                 }
             }
