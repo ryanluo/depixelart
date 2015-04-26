@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <time.h>
+#include <stack>
 
 
 
@@ -15,7 +16,6 @@ Image* ip_blur_box (Image* src, int size)
     cerr << "This function is not implemented." << endl;
     return NULL;
 }
-
 
 /*
  * convolve with a gaussian filter
@@ -351,6 +351,127 @@ void checkRedundancy(int i,
 }
 
 /*
+ * Borders is: 
+ * {left, right, top, bottom}
+ */
+bool bounds(int i,
+            int j,
+            int * borders) {
+    return (borders[0] <= i && i <= borders[1] && borders[2] <= j && j <= borders[3]);
+}
+
+/*
+ * Returns the size of the connected component at pixel i, j.
+ */
+int sizeConnectedComponent(int i,
+                           int j,
+                           int blockSizeX,
+                           int blockSizeY,
+                           int * borders,
+                           vector< vector<bool> > * similarityGraph) {
+    vector<bool> visited(blockSizeX*blockSizeY, false);
+    stack<int> nodesToVisit;
+    vector<bool> adjlist = similarityGraph->at(i*blockSizeY+j);
+    int neighborX = i;
+    int neighborY = j;
+    int numberOfConnectedComponents = 0;
+    for (int index = 0; index < adjlist.size(); ++index) {
+        if(adjlist[index] && bounds(i, j, borders)) {
+            getNeighbor(i, j, &neighborX, &neighborY , index);
+            nodesToVisit.push(neighborX * blockSizeY + neighborY);
+            visited[neighborX * blockSizeY + neighborY] = true;
+            numberOfConnectedComponents++;
+        }
+    }
+
+    int neighbor = i * blockSizeY + blockSizeX;
+    while (!nodesToVisit.empty()) {
+        int visitedNode = nodesToVisit.top();
+        adjlist = similarityGraph->at(visitedNode);
+        for (int index = 0; index < adjlist.size(); ++index) {
+            getNeighbor(visitedNode / blockSizeY, visitedNode % blockSizeY, &neighborX, &neighborY, index);
+            neighbor = neighborX * blockSizeY + neighborY;
+            if (adjlist[index] && !visited[neighbor] && bounds(neighborX, neighborY, borders)) {
+                nodesToVisit.push(neighbor);
+                visited[neighbor] = true;
+                numberOfConnectedComponents++;
+            }
+            
+        }
+        nodesToVisit.pop();
+    }
+    
+    return numberOfConnectedComponents;
+}
+
+void sparsePixels(int i,
+                  int j,
+                  int blockSizeX,
+                  int blockSizeY,
+                  int * weightMajor,
+                  int * weightMinor,
+                  vector< vector<bool> > * similarityGraph) {
+    int left = max(0, i - 3);
+    int right = min(blockSizeX, i + 4);
+    int top = max(0, j - 3);
+    int bottom = min(blockSizeY, j + 4);
+    int borders[] = {left, right, top, bottom};
+    int major = sizeConnectedComponent(i + 1, j, blockSizeX, blockSizeY, borders, similarityGraph);
+    int minor = sizeConnectedComponent(i, j, blockSizeX, blockSizeY, borders, similarityGraph);
+    
+    if (major > minor) *weightMinor += major - minor;
+    else *weightMajor += minor - major;
+}
+
+int getNodeDegree(vector<bool> & neighbors) {
+    int total = 0;
+    for (int i = 0; i < neighbors.size(); ++i) {
+        if (neighbors[i]) ++total;
+    }
+    return total;
+}
+
+/*
+ * Check if one of the diagonal nodes are of valence one. If so, add 5 to
+ * its weight.
+ */
+void islands(int i,
+             int j,
+             int blockSizeX,
+             int blockSizeY,
+             int * weightMajor,
+             int * weightMinor,
+             vector< vector<bool> > & similarityGraph) {
+    int topLeft = getNodeDegree(similarityGraph[i*blockSizeY+j]);
+    int topRight = getNodeDegree(similarityGraph[i*blockSizeY+j+1]);
+    int botLeft = getNodeDegree(similarityGraph[(i+1)*blockSizeY+j]);
+    int botRight =getNodeDegree(similarityGraph[(i+1)*blockSizeY+j+1]);
+    if (topLeft == 1 || botRight == 1) weightMinor += 5;
+    if (topRight == 1 || botLeft == 1) weightMinor += 5;
+}
+
+/*
+ * Pixel at i,j is the left hand corner of a 2x2 block with diagonals.
+ */
+void chooseDiagonals(int i,
+                     int j,
+                     int blockSizeX,
+                     int blockSizeY,
+                     vector< vector<bool> > * similarityGraph) {
+    int weightMajor = 0;
+    int weightMinor = 0;
+    sparsePixels(i, j, blockSizeX, blockSizeY, &weightMajor, &weightMinor, similarityGraph);
+    islands(i, j, blockSizeX, blockSizeY, &weightMajor, &weightMinor, *similarityGraph);
+    if (weightMinor > weightMajor) {
+        similarityGraph->at((i)*blockSizeY+j+1)[2] = false;
+        similarityGraph->at((i+1)*blockSizeY+j)[5] = false;
+    } else {
+        similarityGraph->at((i)*blockSizeY+j)[7] = false;
+        similarityGraph->at((i+1)*blockSizeY+j+1)[0] = false;
+    }
+}
+
+/*
  * define your own filter
  * you need to request any input parameters here, not in control.cpp
  */
@@ -392,13 +513,14 @@ Image* ip_misc(Image* src)
         }
     }
     
-    
+    /*
     for (int i = 0; i < blockSizeX; ++i) {
         for (int j = 0; j < blockSizeY; ++j) {
             for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSizeY + j][k] << ",";
             cout << endl;
         }
     }
+    */
     
     int pixelSize = 15;
     
@@ -419,9 +541,24 @@ Image* ip_misc(Image* src)
     
     for (int i = 0; i < blockSizeX - 1; ++i) {
         for (int j = 0; j < blockSizeY - 1; ++j) {
-            checkRedundancy(i,j,blockSizeX, blockSizeY, &similarityGraph);
+            
+            // If there are cross edges
+            if (similarityGraph[i*blockSizeY + j][7] && similarityGraph[i*blockSizeY + j + 1][2]) {
+                checkRedundancy(i,j,blockSizeX, blockSizeY, &similarityGraph);
+            }
+            
         }
     }
+    
+    for (int i = 0; i < blockSizeX - 1; ++i) {
+        for (int j = 0; j < blockSizeY - 1; ++j) {
+            if (similarityGraph[i*blockSizeY + j][7] && similarityGraph[i*blockSizeY + j + 1][2]) {
+                cout << i<<","<<j<<endl;
+                chooseDiagonals(i,j,blockSizeX, blockSizeY, &similarityGraph);
+            }
+        }
+    }
+    
     
     for(int x = 0; x<blockSizeX; ++x){
         for(int y = 0; y<blockSizeY; ++y){
@@ -434,6 +571,7 @@ Image* ip_misc(Image* src)
                 }
             }
         }
+        
     }
     
     return rawGraphTest;
