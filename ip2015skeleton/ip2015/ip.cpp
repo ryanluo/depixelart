@@ -330,6 +330,45 @@ void getNeighbor(int startX, int startY, int* neighborX, int* neighborY, int ind
     }
 }
 
+int getNeighborIndex(int startIndex, int blockSizeX, int blockSizeY, int neighborIndex){
+    int resultIndex = -1;
+    switch(neighborIndex){
+        case 0: {
+            resultIndex = startIndex - blockSizeY - 1;
+            break;
+        }
+        case 1: {
+            resultIndex = startIndex - 1;
+            break;
+        }
+        case 2: {
+            resultIndex = startIndex + blockSizeY - 1;
+            break;
+        }
+        case 3: {
+            resultIndex = startIndex - blockSizeY;
+            break;
+        }
+        case 4: {
+            resultIndex = startIndex + blockSizeY;
+            break;
+        }
+        case 5: {
+            resultIndex = startIndex - blockSizeY + 1;
+            break;
+        }
+        case 6: {
+            resultIndex = startIndex + 1;
+            break;
+        }
+        case 7: {
+            resultIndex = startIndex + blockSizeY + 1;
+            break;
+        }
+    }
+    return resultIndex;
+}
+
 // Pixel at i,j represents left corner of 2x2 block to check
 void checkRedundancy(int i,
                      int j,
@@ -447,7 +486,81 @@ void islands(int i,
     int botLeft = getNodeDegree(similarityGraph[(i+1)*blockSizeY+j]);
     int botRight =getNodeDegree(similarityGraph[(i+1)*blockSizeY+j+1]);
     if (topLeft == 1 || botRight == 1) weightMinor += 5;
-    if (topRight == 1 || botLeft == 1) weightMinor += 5;
+    //question
+    if (topRight == 1 || botLeft == 1) weightMajor += 5;
+}
+
+/*
+ *goes to the next node given a node index and a visited path. Presuming that the node in question is a valence-2 node
+ */
+int goToNextNode(int nodeIndex, int blockSizeX, int blockSizeY, int visited, vector< vector<bool> > & similarityGraph){
+    vector<bool> neighbors = similarityGraph[nodeIndex];
+    for(int i = 0; i < neighbors.size(); i++){
+        if(neighbors[i]){
+            int neighborIndex = getNeighborIndex(nodeIndex, blockSizeX, blockSizeY, i);
+            if(neighborIndex != visited){
+                return neighborIndex;
+            }
+        }
+    }
+    return -1;
+}
+
+void curve(int i,
+           int j,
+           int blockSizeX,
+           int blockSizeY,
+           int * weightMajor,
+           int * weightMinor,
+           vector< vector<bool> > & similarityGraph) {
+    int topLeftIndex = i*blockSizeY+j;
+    int topRightIndex = i*blockSizeY+j+1;
+    int botLeftIndex = (i+1)*blockSizeY+j;
+    int botRightIndex = (i+1)*blockSizeY+j+1;
+    int topLeft = getNodeDegree(similarityGraph[topLeftIndex]);
+    int topRight = getNodeDegree(similarityGraph[topRightIndex]);
+    int botLeft = getNodeDegree(similarityGraph[botLeftIndex]);
+    int botRight =getNodeDegree(similarityGraph[botRightIndex]);
+    int topLeftVisited = botRightIndex;
+    int topRightVisited = botLeftIndex;
+    int botLeftVisited = topRightIndex;
+    int botRightVisited = topLeftIndex;
+    int newTopLeftIndex, newTopRightIndex, newBotLeftIndex, newBotRightIndex;
+    int majorLength = 1;
+    int minorLength = 1;
+    while(topLeft == 2){
+        minorLength++;
+        newTopLeftIndex = goToNextNode(topLeftIndex, blockSizeX, blockSizeY, topLeftVisited, similarityGraph);
+        topLeftVisited = topLeftIndex;
+        topLeftIndex = newTopLeftIndex;
+        topLeft = getNodeDegree(similarityGraph[newTopLeftIndex]);
+    }
+    while(botRight == 2){
+        minorLength++;
+        newBotRightIndex = goToNextNode(botRightIndex, blockSizeX, blockSizeY, botRightVisited, similarityGraph);
+        botRightVisited = botRightIndex;
+        botRightIndex = newBotRightIndex;
+        botRight = getNodeDegree(similarityGraph[newBotRightIndex]);
+    }
+    while(topRight == 2){
+        majorLength++;
+        newTopRightIndex = goToNextNode(topRightIndex, blockSizeX, blockSizeY, topRightVisited, similarityGraph);
+        topRightVisited = topRightIndex;
+        topRightIndex = newTopRightIndex;
+        topRight = getNodeDegree(similarityGraph[newTopRightIndex]);
+    }
+    while(botLeft == 2){
+        majorLength++;
+        newBotLeftIndex = goToNextNode(botLeftIndex, blockSizeX, blockSizeY, botLeftVisited, similarityGraph);
+        botLeftVisited = botLeftIndex;
+        botLeftIndex = newBotLeftIndex;
+        botLeft = getNodeDegree(similarityGraph[newBotLeftIndex]);
+    }
+    if(majorLength>minorLength){
+        weightMajor += 6;
+    }else if(minorLength>majorLength){
+        weightMinor += 6;
+    }
 }
 
 /*
@@ -462,6 +575,7 @@ void chooseDiagonals(int i,
     int weightMinor = 0;
     sparsePixels(i, j, blockSizeX, blockSizeY, &weightMajor, &weightMinor, similarityGraph);
     islands(i, j, blockSizeX, blockSizeY, &weightMajor, &weightMinor, *similarityGraph);
+    curve(i, j, blockSizeX, blockSizeY, &weightMajor, &weightMinor, *similarityGraph);
     if (weightMinor > weightMajor) {
         similarityGraph->at((i)*blockSizeY+j+1)[2] = false;
         similarityGraph->at((i+1)*blockSizeY+j)[5] = false;
