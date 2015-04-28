@@ -738,14 +738,15 @@ Image* ip_misc(Image* src)
     }
     
     
-    for(int x = 0; x<blockSizeX; ++x){
-        for(int y = 0; y<blockSizeY; ++y){
+    for(int i = 0; i<blockSizeX; ++i){
+        for(int j = 0; j<blockSizeY; ++j){
             for(int k = 0; k<8; ++k){
-                if(similarityGraph[x*blockSizeY+y][k]){
-                    int endX = x;
-                    int endY = y;
-                    getNeighbor(x, y, &endX, &endY, k);
-                    
+                if(similarityGraph[i*blockSizeY+j][k]){
+                    int endX = i;
+                    int endY = j;
+                    getNeighbor(i, j, &endX, &endY, k);
+                    if (similarityGraph[i*blockSizeY + j][7] || similarityGraph[i*blockSizeY + j][2] ||similarityGraph[i*blockSizeY + j][0] || similarityGraph[i*blockSizeY + j][5])
+
                     reshapePixels(similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
                     //drawEdge(x, y, endX, endY, pixelSize, *rawGraphTest);
                 }

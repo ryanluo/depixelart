@@ -92,7 +92,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "332"
-            endingLineNumber = "332">
+            endingLineNumber = "332"
+            landmarkName = "getNeighbor(int startX, int startY, int* neighborX, int* neighborY, int index)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
