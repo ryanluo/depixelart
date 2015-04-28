@@ -595,10 +595,10 @@ void drawLineFromMidpoint(int i, int j, int pixelSize, int neighborIndex, Image&
             src.setPixel(i + k - 1, j - k, p);
         }
     }else if(neighborIndex == 2 || neighborIndex == 5){
-        for(int k = - halfRange; k <= halfRange; k++){
+        for(int k = - halfRange ; k <= halfRange; k++){
             src.setPixel(i + k, j + k, p);
             src.setPixel(i + k - 1, j + k, p);
-            src.setPixel(i + k + 1, j - k, p);
+            src.setPixel(i + k + 1, j + k, p);
         }
     }
 }
@@ -610,25 +610,25 @@ void reshapePixel(int i, int j, int pixelSize, int neighborIndex, Image& src){
     if(neighborIndex == 0){
         int startDiagX = i*pixelSize;
         int startDiagY = j*pixelSize;
-        for(int k = 0; k < pixelSize/4+1; k++){
+        for(int k = 0; k <= pixelSize/4+1; k++){
             drawLineFromMidpoint(startDiagX+k, startDiagY+k, pixelSize, 0, src, p);
         }
     }else if(neighborIndex == 2){
         int startDiagX = i*pixelSize + pixelSize;
         int startDiagY = j*pixelSize;
-        for(int k = 0; k < pixelSize/4+1; k++){
+        for(int k = 0; k <= pixelSize/4+1; k++){
             drawLineFromMidpoint(startDiagX-k, startDiagY+k, pixelSize, 2, src, p);
         }
     }else if(neighborIndex == 5){
         int startDiagX = i*pixelSize;
         int startDiagY = j*pixelSize + pixelSize;
-        for(int k = 0; k < pixelSize/4+1; k++){
+        for(int k = 0; k <= pixelSize/4+1; k++){
             drawLineFromMidpoint(startDiagX+k, startDiagY-k, pixelSize, 5, src, p);
         }
     }else if(neighborIndex == 7){
         int startDiagX = i*pixelSize + pixelSize;
         int startDiagY = j*pixelSize + pixelSize;
-        for(int k = 0; k < pixelSize/4+1; k++){
+        for(int k = 0; k <= pixelSize/4+1; k++){
             drawLineFromMidpoint(startDiagX-k, startDiagY-k, pixelSize, 7, src, p);
         }
     }
