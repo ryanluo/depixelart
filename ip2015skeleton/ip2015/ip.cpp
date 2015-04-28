@@ -732,7 +732,6 @@ Image* ip_misc(Image* src)
     for (int i = 0; i < blockSizeX - 1; ++i) {
         for (int j = 0; j < blockSizeY - 1; ++j) {
             if (similarityGraph[i*blockSizeY + j][7] && similarityGraph[i*blockSizeY + j + 1][2]) {
-                cout << i<<","<<j<<endl;
                 chooseDiagonals(i,j,blockSizeX, blockSizeY, &similarityGraph);
             }
         }
