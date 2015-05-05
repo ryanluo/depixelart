@@ -125,7 +125,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "695"
             endingLineNumber = "695"
-            landmarkName = "ip_misc(Image* src)"
+            landmarkName = "ip_misc(Image* src, ImageGraph* imageGraph, vector&lt;vector&lt;bool&gt;&gt;* similarityGraph, const int blockSizeX, const int blockSizeY, const int pixelSize)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -16,6 +16,9 @@ int  window_height = 300;
 
 Image* currentImage  = NULL;
 Image* originalImage = NULL;
+ImageGraph* currentImageGraph = NULL;
+vector<vector<bool>>* similarityGraph = NULL;
+
 
 bool quietMode = false;
 bool textMode  = false;
@@ -141,7 +144,11 @@ void display ()
     glClear(GL_COLOR_BUFFER_BIT);
     
     // draw the image
-    if (currentImage)
+    if (currentImageGraph) {
+        for (int i = 0; i < currentImageGraph->size(); ++i)
+            currentImageGraph->at(i).glDrawPolygonWrapper();
+    }
+    else if (currentImage)
         currentImage->glDrawPixelsWrapper();
     
     // swap buffers

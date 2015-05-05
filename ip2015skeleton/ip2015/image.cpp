@@ -399,8 +399,6 @@ void Image::glDrawPixelsWrapper ()
 
 
 	glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-
 }
 
 
@@ -960,4 +958,53 @@ int Image::writeBMP (ofstream& fp)
 	}
 
 	return 0;
+}
+
+ImagePixel::ImagePixel() {
+    this->p = Pixel(0,0,0);
+}
+
+ImagePixel::ImagePixel(Pixel p, vector<vector<GLfloat>> vertices) {
+    this->p = p;
+    this->vertices = vertices;
+    for (int k = 0; k < 3; ++k) this->color[k] = p.getColor(k);
+    color[3] = 1.0;
+}
+
+
+// assignment operator
+ImagePixel& ImagePixel::operator = (const ImagePixel& toCopy)
+{
+    
+    if (this != &toCopy) {
+        this->p = toCopy.p;
+        this->vertices = toCopy.vertices;
+        for (int k = 0; k < 3; ++k) this->color[k] = this->p.getColor(k);
+    }
+    return *this;
+}
+
+ImagePixel::~ImagePixel() {
+
+}
+
+
+Pixel ImagePixel::getPixel(){
+    return p;
+}
+
+
+void ImagePixel::glDrawPolygonWrapper ()
+{
+    glColor4fv(color);
+    glBegin(GL_POLYGON);
+    GLfloat vertex[2];
+    for (int k = 0; k < vertices.size(); ++k) {
+        for (int l = 0; l < 2; ++l) {
+            vertex[l] = vertices[k][l];
+        }
+        cout << vertex[0] << "," << vertex[1] << endl;
+        glVertex2fv(vertex);
+    }
+    glEnd();
 }

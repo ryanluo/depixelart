@@ -356,7 +356,7 @@ void process_func (int value)
 		break;
 
 	case M_PROCESS_MISC: // enum #20
-		resultImage = ip_misc(currentImage);
+		resultImage = ip_misc(currentImage, currentImageGraph, similarityGraph, 40, 16, 15);
 		break;
 
 
