@@ -40,7 +40,7 @@ Image*	ip_grey (Image* src);
 Image*  ip_image_shift(Image* src, double dx, double dy);
 Image*  ip_interpolate(Image* src1, Image* src2, double alpha);
 Image*	ip_invert (Image* src);
-Image*	ip_misc(Image* src);
+Image*	ip_misc(Image* src, ImageGraph* imageGraph, vector<vector<bool>> * similarityGraph, const int blockSizeX, const int blockSizeY, const int pixelSize);
 Image*	ip_quantize_simple (Image* src, int bitsPerChannel);
 Image*	ip_quantize_ordered (Image* src, int bitsPerChannel);
 Image*	ip_quantize_fs (Image* src, int bitsPerChannel);

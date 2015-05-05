@@ -17,6 +17,8 @@ extern int window_height;
 
 extern Image* currentImage;
 extern Image* originalImage;
+extern ImageGraph* currentImageGraph;
+extern vector<vector<bool>>* similarityGraph;
 
 extern bool quietMode;
 extern bool textMode;

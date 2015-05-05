@@ -64,5 +64,4 @@
 #define VECTOR(t)		std::vector < t >
 #define MAP(s,t)		std::map < s, t >
 
-
 #endif // COMMON_H

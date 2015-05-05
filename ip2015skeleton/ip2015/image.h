@@ -138,4 +138,20 @@ private:
 };
 
 
+class ImagePixel {
+public:
+    ImagePixel();
+    ImagePixel(Pixel p, vector<vector<GLfloat>> vertices);
+    Pixel getPixel();
+    void glDrawPolygonWrapper();
+    ImagePixel& operator=(const ImagePixel& toCopy);
+    ~ImagePixel ();
+private:
+    Pixel p;
+    GLfloat color[4];
+    vector<vector<GLfloat>> vertices;
+};
+
+typedef vector<ImagePixel> ImageGraph;
+
 #endif // IMAGE_H
