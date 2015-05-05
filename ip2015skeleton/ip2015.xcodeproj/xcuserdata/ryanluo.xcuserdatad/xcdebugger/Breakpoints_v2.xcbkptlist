@@ -103,29 +103,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ip2015/image.h"
-            timestampString = "452467454.660309"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "151"
-            endingLineNumber = "151"
-            landmarkName = "class ImagePixel"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "ip2015/ip.cpp"
-            timestampString = "452471854.516018"
+            timestampString = "452495203.46086"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "695"
             endingLineNumber = "695"
-            landmarkName = "ip_misc(Image* src, ImageGraph* imageGraph, vector&lt;vector&lt;bool&gt;&gt;* similarityGraph, const int blockSizeX, const int blockSizeY, const int pixelSize)"
+            landmarkName = "reshapePixelGl(int i, int j, vector&lt;bool&gt; adjList, ImageGraph* src, int blockSizeX, int blockSizeY, int pixelSize)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -152,11 +136,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ip2015/image.cpp"
-            timestampString = "452467758.625313"
+            timestampString = "452494026.735998"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1001"
-            endingLineNumber = "1001"
+            startingLineNumber = "1010"
+            endingLineNumber = "1010"
             landmarkName = "ImagePixel::glDrawPolygonWrapper ()"
             landmarkType = "5">
          </BreakpointContent>

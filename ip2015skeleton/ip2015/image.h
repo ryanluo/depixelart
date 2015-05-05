@@ -144,11 +144,13 @@ public:
     ImagePixel(Pixel p, vector<vector<GLfloat>> vertices);
     Pixel getPixel();
     void glDrawPolygonWrapper();
+    void setPixel(Pixel p);
     ImagePixel& operator=(const ImagePixel& toCopy);
     ~ImagePixel ();
     vector<vector<GLfloat>> vertices;
-private:
     Pixel p;
+
+private:
     GLfloat color[4];
 };
 

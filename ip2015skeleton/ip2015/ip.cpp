@@ -657,7 +657,7 @@ void reshapePixelGl(int i,
                     int pixelSize){
 
     ImagePixel* p = &currentImageGraph->at(i*blockSizeY+j);
-    //cout << p << endl;
+    //cout << &(p->vertices) << endl;
 
     ImagePixel* T;
     ImagePixel* TL;
@@ -669,12 +669,12 @@ void reshapePixelGl(int i,
         TL = &(*src)[(i-1)*blockSizeY + (j-1)];
         T = &(*src)[i*blockSizeY + (j-1)];
         L = &(*src)[(i-1)*blockSizeY + j];
-        
+        // cout << p->vertices[0][0] << "," << p -> vertices[0][1] << endl;
+
         p->vertices[0][0] += pixelSize/4;
         p->vertices[0][1] += pixelSize/4;
         p->vertices[1][0] -= pixelSize/4;
         p->vertices[1][1] -= pixelSize/4;
-       // cout << p->vertices[0][0] << "," << p -> vertices[0][1] << endl;
         
         
         T->vertices[2][0] += 0.25*pixelSize;
@@ -782,13 +782,13 @@ Image* ip_misc(Image* src,
             // Polygon ordering counter clockwise
             
             for (int k = 0; k < 4; ++k) {
-                vertices[2*k][0] = static_cast<float>((i + (k > 1 ? 1: 0)) * pixelSize);
-                vertices[2*k][1] = static_cast<float>(16 * pixelSize - (j + (k==1 || k ==2 ? 1:0)) * pixelSize);
-                vertices[2*k+1][0] = static_cast<float>((i + (k > 1 ? 1: 0)) * pixelSize);
-                vertices[2*k+1][1] = static_cast<float>(16 * pixelSize - (j + (k==1 || k ==2 ? 1:0)) * pixelSize);
+                currentImageGraph->at(i*blockSizeY+j).vertices[2*k][0] = static_cast<float>((i + (k > 1 ? 1: 0)) * pixelSize);
+                currentImageGraph->at(i*blockSizeY+j).vertices[2*k][1] = static_cast<float>(16 * pixelSize - (j + (k==1 || k ==2 ? 1:0)) * pixelSize);
+                currentImageGraph->at(i*blockSizeY+j).vertices[2*k+1][0] = static_cast<float>((i + (k > 1 ? 1: 0)) * pixelSize);
+                currentImageGraph->at(i*blockSizeY+j).vertices[2*k+1][1] = static_cast<float>(16 * pixelSize - (j + (k==1 || k ==2 ? 1:0)) * pixelSize);
             }
             
-            currentImageGraph->at(i*blockSizeY+j) = ImagePixel(outputPixel, vertices);
+            currentImageGraph->at(i*blockSizeY+j).setPixel(outputPixel);
             rawGraph->setPixel(i, j, outputPixel);
 //            outputPixel = Pixel(0,0,0);
 //            rawGraph->setPixel(i, j, outputPixel);
@@ -848,24 +848,25 @@ Image* ip_misc(Image* src,
         }
     }
     
+    reshapePixelsGl(*similarityGraph, currentImageGraph, blockSizeX, blockSizeY, pixelSize);
+//
+//    for(int i = 0; i<blockSizeX; ++i){
+//        for(int j = 0; j<blockSizeY; ++j){
+//            for(int k = 0; k<8; ++k){
+//                if(similarityGraph->at(i*blockSizeY+j)[k]){
+//                    int endX = i;
+//                    int endY = j;
+//                    getNeighbor(i, j, &endX, &endY, k);
+//                    if (similarityGraph->at(i*blockSizeY + j)[7] || similarityGraph->at(i*blockSizeY + j)[2] ||similarityGraph->at(i*blockSizeY + j)[0] || similarityGraph->at(i*blockSizeY + j)[5])
+//                        
+//                    
+//                    //reshapePixels(*similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
+//                     reshapePixelsGl(*similarityGraph, currentImageGraph, blockSizeX, blockSizeY, pixelSize);
+//                    //drawEdge(x, y, endX, endY, pixelSize, *rawGraphTest);
+//                }
+//            }
+//        }
     
-    for(int i = 0; i<blockSizeX; ++i){
-        for(int j = 0; j<blockSizeY; ++j){
-            for(int k = 0; k<8; ++k){
-                if(similarityGraph->at(i*blockSizeY+j)[k]){
-                    int endX = i;
-                    int endY = j;
-                    getNeighbor(i, j, &endX, &endY, k);
-                    if (similarityGraph->at(i*blockSizeY + j)[7] || similarityGraph->at(i*blockSizeY + j)[2] ||similarityGraph->at(i*blockSizeY + j)[0] || similarityGraph->at(i*blockSizeY + j)[5])
-                        
-                    
-                    //reshapePixels(*similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
-                     reshapePixelsGl(*similarityGraph, currentImageGraph, blockSizeX, blockSizeY, pixelSize);
-                    //drawEdge(x, y, endX, endY, pixelSize, *rawGraphTest);
-                }
-            }
-        }
-        
 //    }
 //    
 //    for(int i = 0; i<blockSizeX; ++i){
@@ -881,7 +882,7 @@ Image* ip_misc(Image* src,
 //            }
 //        }
 //        
-    }
+ //   }
     
     return rawGraphTest;
 }

@@ -962,17 +962,25 @@ int Image::writeBMP (ofstream& fp)
 
 ImagePixel::ImagePixel() {
     this->p = Pixel(0,0,0);
+    this->vertices = vector<vector<GLfloat>>(8,vector<GLfloat>(2));
+
 }
 
 ImagePixel::ImagePixel(Pixel p, vector<vector<GLfloat>> vertices) {
     this->p = p;
     this->vertices = vector<vector<GLfloat>>(8,vector<GLfloat>(2));
+
     for (int k = 0; k < vertices.size(); ++k)
         for (int l = 0; l < vertices[k].size(); ++l) this->vertices[k][l] = vertices[k][l];
     for (int k = 0; k < 3; ++k) this->color[k] = p.getColor(k);
     color[3] = 1.0;
 }
 
+void ImagePixel::setPixel(Pixel p) {
+    this->p = p;
+    for (int k = 0; k < 3; ++k) this->color[k] = p.getColor(k);
+    color[3] = 1.0;
+}
 
 // assignment operator
 ImagePixel& ImagePixel::operator = (const ImagePixel& toCopy)
@@ -980,7 +988,8 @@ ImagePixel& ImagePixel::operator = (const ImagePixel& toCopy)
     
     if (this != &toCopy) {
         this->p = toCopy.p;
-        this->vertices = toCopy.vertices;
+        for (int k = 0; k < toCopy.vertices.size(); ++k)
+            for (int l = 0; l < toCopy.vertices[k].size(); ++l) this->vertices[k][l] = toCopy.vertices[k][l];
         for (int k = 0; k < 3; ++k) this->color[k] = this->p.getColor(k);
     }
     return *this;
@@ -1001,9 +1010,9 @@ void ImagePixel::glDrawPolygonWrapper ()
     glColor4fv(color);
     glBegin(GL_POLYGON);
     GLfloat vertex[2];
-    for (int k = 0; k < vertices.size(); ++k) {
+    for (int k = 0; k < this->vertices.size(); ++k) {
         for (int l = 0; l < 2; ++l) {
-            vertex[l] = vertices[k][l];
+            vertex[l] = this->vertices[k][l];
         }
         cout << vertex[0] << "," << vertex[1] << " ";
         glVertex2fv(vertex);
