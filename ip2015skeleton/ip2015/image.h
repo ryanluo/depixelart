@@ -146,10 +146,10 @@ public:
     void glDrawPolygonWrapper();
     ImagePixel& operator=(const ImagePixel& toCopy);
     ~ImagePixel ();
+    vector<vector<GLfloat>> vertices;
 private:
     Pixel p;
     GLfloat color[4];
-    vector<vector<GLfloat>> vertices;
 };
 
 typedef vector<ImagePixel> ImageGraph;

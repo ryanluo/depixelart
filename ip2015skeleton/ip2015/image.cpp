@@ -966,7 +966,9 @@ ImagePixel::ImagePixel() {
 
 ImagePixel::ImagePixel(Pixel p, vector<vector<GLfloat>> vertices) {
     this->p = p;
-    this->vertices = vertices;
+    this->vertices = vector<vector<GLfloat>>(8,vector<GLfloat>(2));
+    for (int k = 0; k < vertices.size(); ++k)
+        for (int l = 0; l < vertices[k].size(); ++l) this->vertices[k][l] = vertices[k][l];
     for (int k = 0; k < 3; ++k) this->color[k] = p.getColor(k);
     color[3] = 1.0;
 }
@@ -1003,8 +1005,9 @@ void ImagePixel::glDrawPolygonWrapper ()
         for (int l = 0; l < 2; ++l) {
             vertex[l] = vertices[k][l];
         }
-        cout << vertex[0] << "," << vertex[1] << endl;
+        cout << vertex[0] << "," << vertex[1] << " ";
         glVertex2fv(vertex);
     }
+    cout << endl;
     glEnd();
 }

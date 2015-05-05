@@ -648,6 +648,96 @@ void reshapePixels(vector< vector<bool> > &similarityGraph,
     }
 }
 
+void reshapePixelGl(int i,
+                    int j,
+                    vector<bool> adjList,
+                    ImageGraph* src,
+                    int blockSizeX,
+                    int blockSizeY,
+                    int pixelSize){
+
+    ImagePixel* p = &currentImageGraph->at(i*blockSizeY+j);
+    //cout << p << endl;
+
+    ImagePixel* T;
+    ImagePixel* TL;
+    ImagePixel* TR;
+    ImagePixel* L;
+    ImagePixel* R;
+    
+    if(adjList[0]){
+        TL = &(*src)[(i-1)*blockSizeY + (j-1)];
+        T = &(*src)[i*blockSizeY + (j-1)];
+        L = &(*src)[(i-1)*blockSizeY + j];
+        
+        p->vertices[0][0] += pixelSize/4;
+        p->vertices[0][1] += pixelSize/4;
+        p->vertices[1][0] -= pixelSize/4;
+        p->vertices[1][1] -= pixelSize/4;
+       // cout << p->vertices[0][0] << "," << p -> vertices[0][1] << endl;
+        
+        
+        T->vertices[2][0] += 0.25*pixelSize;
+        T->vertices[2][1] += 0.25*pixelSize;
+        T->vertices[3][0] += 0.25*pixelSize;
+        T->vertices[3][1] += 0.25*pixelSize;
+        
+        TL->vertices[4][0] -= 0.25*pixelSize;
+        TL->vertices[4][1] -= 0.25*pixelSize;
+        TL->vertices[5][0] += 0.25*pixelSize;
+        TL->vertices[5][1] += 0.25*pixelSize;
+        
+        L->vertices[6][0] -= 0.25*pixelSize;
+        L->vertices[6][1] -= 0.25*pixelSize;
+        L->vertices[7][0] -= 0.25*pixelSize;
+        L->vertices[7][1] -= 0.25*pixelSize;
+    }
+    
+    if(adjList[2]){
+        T = &(*src)[i*blockSizeY + (j-1)];
+        TR = &(*src)[(i+1)*blockSizeY + (j-1)];
+        R = &(*src)[(i+1)*blockSizeY + j];
+        
+        p->vertices[6][0] += 0.25*pixelSize;
+        p->vertices[6][1] -= 0.25*pixelSize;
+        p->vertices[7][0] -= 0.25*pixelSize;
+        p->vertices[7][1] += 0.25*pixelSize;
+//        
+
+        T->vertices[4][0] -= 0.25*pixelSize;
+        T->vertices[4][1] += 0.25*pixelSize;
+        T->vertices[5][0] -= 0.25*pixelSize;
+        T->vertices[5][1] += 0.25*pixelSize;
+        
+        TR->vertices[2][0] -= 0.25*pixelSize;
+        TR->vertices[2][1] += 0.25*pixelSize;
+        TR->vertices[3][0] += 0.25*pixelSize;
+        TR->vertices[3][1] -= 0.25*pixelSize;
+        
+        R->vertices[0][0] += 0.25*pixelSize;
+        R->vertices[0][1] -= 0.25*pixelSize;
+        R->vertices[1][0] += 0.25*pixelSize;
+        R->vertices[1][1] -= 0.25*pixelSize;
+    }
+    
+//
+//    ImagePixel TR = src[(i+1)*blockSizeY + (j-1)];
+    
+}
+
+void reshapePixelsGl(vector< vector<bool> > &similarityGraph,
+                     ImageGraph* src,
+                     int blockSizeX,
+                     int blockSizeY,
+                     int pixelSize){
+    for(int i=0; i<blockSizeX; i++){
+        for(int j=0; j<blockSizeY; j++){
+            reshapePixelGl(i, j, similarityGraph[i*blockSizeY+j], src, blockSizeX, blockSizeY, pixelSize);
+        }
+    }
+
+}
+
 
 
 /*
@@ -698,8 +788,10 @@ Image* ip_misc(Image* src,
                 vertices[2*k+1][1] = static_cast<float>(16 * pixelSize - (j + (k==1 || k ==2 ? 1:0)) * pixelSize);
             }
             
-            currentImageGraph->at(i + j*blockSizeX) = ImagePixel(outputPixel, vertices);
+            currentImageGraph->at(i*blockSizeY+j) = ImagePixel(outputPixel, vertices);
             rawGraph->setPixel(i, j, outputPixel);
+//            outputPixel = Pixel(0,0,0);
+//            rawGraph->setPixel(i, j, outputPixel);
             
         }
     }
@@ -712,14 +804,16 @@ Image* ip_misc(Image* src,
         }
     }
     
-    /*
-    for (int i = 0; i < blockSizeX; ++i) {
-        for (int j = 0; j < blockSizeY; ++j) {
-            for (int k = 0; k < 8; ++k) cout << similarityGraph[i*blockSizeY + j][k] << ",";
-            cout << endl;
-        }
-    }
-    */
+//    
+//    for (int i = 0; i < blockSizeX; ++i) {
+//        for (int j = 0; j < blockSizeY; ++j) {
+//            for (int k = 0; k < 8; ++k) cout << similarityGraph->at(i*blockSizeY + j)
+//                [k] << ",";
+//            cout << endl;
+//        }
+//    }
+//    
+//    
     
     
     Image* rawGraphTest = new Image(blockSizeX*pixelSize, blockSizeY*pixelSize, 3);
@@ -736,10 +830,9 @@ Image* ip_misc(Image* src,
             }
         }
     }
-    
+
     for (int i = 0; i < blockSizeX - 1; ++i) {
         for (int j = 0; j < blockSizeY - 1; ++j) {
-            
             // If there are cross edges
             if (similarityGraph->at(i*blockSizeY + j)[7] && similarityGraph->at(i*blockSizeY + j + 1)[2]) {
                 checkRedundancy(i,j,blockSizeX, blockSizeY, similarityGraph);
@@ -747,7 +840,6 @@ Image* ip_misc(Image* src,
             
         }
     }
-    
     for (int i = 0; i < blockSizeX - 1; ++i) {
         for (int j = 0; j < blockSizeY - 1; ++j) {
             if (similarityGraph->at(i*blockSizeY + j)[7] && similarityGraph->at(i*blockSizeY + j + 1)[2]) {
@@ -765,28 +857,30 @@ Image* ip_misc(Image* src,
                     int endY = j;
                     getNeighbor(i, j, &endX, &endY, k);
                     if (similarityGraph->at(i*blockSizeY + j)[7] || similarityGraph->at(i*blockSizeY + j)[2] ||similarityGraph->at(i*blockSizeY + j)[0] || similarityGraph->at(i*blockSizeY + j)[5])
-
-                    reshapePixels(*similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
+                        
+                    
+                    //reshapePixels(*similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
+                     reshapePixelsGl(*similarityGraph, currentImageGraph, blockSizeX, blockSizeY, pixelSize);
                     //drawEdge(x, y, endX, endY, pixelSize, *rawGraphTest);
                 }
             }
         }
         
-    }
-    
-    for(int i = 0; i<blockSizeX; ++i){
-        for(int j = 0; j<blockSizeY; ++j){
-            for(int k = 0; k<8; ++k){
-                if(similarityGraph->at(i*blockSizeY+j)[k]){
-                    int endX = i;
-                    int endY = j;
-                    getNeighbor(i, j, &endX, &endY, k);
-                    //reshapePixels(similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
-                    drawEdge(i, j, endX, endY, pixelSize, *rawGraphTest);
-                }
-            }
-        }
-        
+//    }
+//    
+//    for(int i = 0; i<blockSizeX; ++i){
+//        for(int j = 0; j<blockSizeY; ++j){
+//            for(int k = 0; k<8; ++k){
+//                if(similarityGraph->at(i*blockSizeY+j)[k]){
+//                    int endX = i;
+//                    int endY = j;
+//                    getNeighbor(i, j, &endX, &endY, k);
+//                    //reshapePixels(similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
+//                    drawEdge(i, j, endX, endY, pixelSize, *rawGraphTest);
+//                }
+//            }
+//        }
+//        
     }
     
     return rawGraphTest;
