@@ -146,9 +146,17 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     if (points.size() < 1) return;
     /*  approximate the curve by a line strip through sample points	*/
     //glEnable(GL_LINE_WIDTH);
-    glLineWidth(30.f);
+    glLineWidth(3.f);
     glPointSize(5);
     glPushMatrix();
+    
+    glBegin(GL_POINTS);
+    for (int i = 0; i < points.size(); ++i) {
+        GLfloat poly[2] = { points[i][0], points[i][1]};
+        glVertex3f(points[i][0], points[i][1], 0);
+    }
+    glEnd();
+    
     GLfloat translate[2] = {points[0][0], points[0][1]};
     glTranslatef(translate[0], translate[1], 0.);
     
@@ -156,12 +164,8 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     glBegin(GL_LINE_STRIP);
     float numSamples=100.;
     float t=0;
-    /*
-    for (int i = 0; i < points.size(); ++i) {
-        GLfloat poly[2] = { points[i][0], points[i][1]};
-        glVertex3f(points[i][0], points[i][1], 0);
-    }
-    */
+    
+    
     // move to origin, translate later.
     for (int i = 0; i < numPoints; ++i)
         for (int k = 0; k < 2; ++k) points[i][k] -= translate[k];
@@ -170,7 +174,7 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     while (t < numPoints) {
         float polyVal[3] = {0., 0., 0.};
         for (int i = 0; i < numPoints; ++i) {
-            for (int k = 0; k < 2; ++k) polyVal[k] += N(i, 2, t, knots) * points[i][k];
+            for (int k = 0; k < 2; ++k) polyVal[k] += N(i, 3, t, knots) * points[i][k];
         }
         glVertex3fv(polyVal);
         t += ((float) numPoints)/numSamples;
