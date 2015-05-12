@@ -160,13 +160,14 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     GLfloat translate[2] = {points[0][0], points[0][1]};
     glTranslatef(translate[0], translate[1], 0.);
     
-
+    glColor3f(1, 0, 0);
     glBegin(GL_LINE_STRIP);
     float numSamples=100.;
     float t=0;
     
     
     // move to origin, translate later.
+    
     for (int i = 0; i < numPoints; ++i)
         for (int k = 0; k < 2; ++k) points[i][k] -= translate[k];
     
