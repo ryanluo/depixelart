@@ -1209,12 +1209,11 @@ int startOfCurve(int i, int j, int blockSizeX, int blockSizeY, vector<vector<boo
     return 0;
 }
 
-vector< vector< vector< GLfloat >>> extractControlPoints(ImageGraph* imageGraph,
+vector< vector< vector< GLfloat >>> extractControlPoints(
                                                      vector<vector<bool>>* simplifiedGraph,
                                                      int blockSizeX,
                                                      int blockSizeY){
     vector<vector<bool>> clockWiseGraph = clockWiseSimplifiedGraph(*simplifiedGraph, blockSizeX, blockSizeY);
-    
     vector<vector<vector<GLfloat >>> curves = *new vector<vector<vector<GLfloat >>>();
     
     vector<vector<vector<GLfloat>>> currentCurves;
@@ -1226,7 +1225,7 @@ vector< vector< vector< GLfloat >>> extractControlPoints(ImageGraph* imageGraph,
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, true);
                     curves.push_back(currentCurves[0]);
                     curves.push_back(currentCurves[1]);
-                }else if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==2){
+                } else if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==2){
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, false);
                     curves.push_back(currentCurves[0]);
                     curves.push_back(currentCurves[1]);
@@ -1235,6 +1234,11 @@ vector< vector< vector< GLfloat >>> extractControlPoints(ImageGraph* imageGraph,
         }
     }
     
+    curveVector = new vector<vector<vector<GLfloat >>>();
+
+    for (int i = 0; i < curves.size(); ++i) {
+        curveVector->push_back(curves[i]);
+    }
     
     return curves;
 }
@@ -1371,6 +1375,9 @@ Image* ip_misc(Image* src,
 //    }
 //
     vector<vector<bool>> simplifiedGraph = simplifiedSimilarityGraph(*similarityGraph, blockSizeX, blockSizeY);
+    
+    
+    extractControlPoints(&simplifiedGraph, blockSizeX, blockSizeY);
 //    //vector<vector<bool>> simplifiedGraph = *similarityGraph;
 //    for(int i = 0; i<blockSizeX; ++i){
 //        for(int j = 0; j<blockSizeY; ++j){
