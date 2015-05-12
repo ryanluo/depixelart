@@ -150,10 +150,15 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> points) {
     /*  approximate the curve by a line strip through sample points	*/
     glEnable(GL_LINE_WIDTH);
     glLineWidth(30.f);
-    glBegin(GL_LINE_STRIP);
+    glPointSize(5);
+    glBegin(GL_POINTS);
     float numSamples=1000.;
     float t=0;
-    
+    for (int i = 0; i < points.size(); ++i) {
+        GLfloat poly[2] = { points[i][0], points[i][1]};
+        glVertex3f(points[i][0], points[i][1], 0);
+    }
+    /*
     while (t < numPoints) {
         float polyVal[3] = {0., 0., 0.};
         for (int i = 0; i < numPoints; ++i) {
@@ -162,13 +167,14 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> points) {
         glVertex3fv(polyVal);
         t += ((float) numPoints)/numSamples;
     }
+    */
     
     /* the curve ends at a control point when t=1  				*/
     /* because the increment 1.0/numSamples  has finite precision	*/
     /* t probably won't hit 1.0 exactly, so we force it			*/
     
     glEnd();
-    glDisable(GL_LINE_WIDTH);
+    glDisable(GL_POINTS);
 }
 
 void display ()
