@@ -18,7 +18,7 @@ Image* currentImage  = NULL;
 Image* originalImage = NULL;
 ImageGraph* currentImageGraph = NULL;
 vector<vector<bool>>* similarityGraph = NULL;
-
+vector<vector<vector<GLfloat>>> * curveVector = NULL;
 
 bool quietMode = false;
 bool textMode  = false;
@@ -127,6 +127,50 @@ void usage ()
 }
 
 
+float N (int i, int k, float t, vector<int>& knots) {
+    if (k == 1) {
+        if (knots[i] <= t && t < knots[i+1]) return 1;
+        else return 0;
+        
+    }
+    return ((float) t - i) / ((float) k) * N(i, k - 1, t, knots) +
+    ((float) i + k - t + 1)/((float) k) * N(i+1, k-1, t, knots);
+}
+
+void drawCurve(int startPoint, vector<vector<GLfloat>> points) {
+    long numPoints = points.size();
+    vector<int> knots(numPoints + 2);
+    for (int i = 0; i < numPoints + 2; ++i) {
+        knots[i] = i;
+    }
+    
+    if (startPoint<0 || startPoint+2>=numPoints)
+        return;
+    
+    /*  approximate the curve by a line strip through sample points	*/
+    glEnable(GL_LINE_WIDTH);
+    glLineWidth(30.f);
+    glBegin(GL_LINE_STRIP);
+    float numSamples=1000.;
+    float t=0;
+    
+    while (t < numPoints) {
+        float polyVal[3] = {0., 0., 0.};
+        for (int i = 0; i < numPoints; ++i) {
+            for (int k = 0; k < 3; ++k) polyVal[k] += N(i, 3, t, knots) * points[i][k];
+        }
+        glVertex3fv(polyVal);
+        t += ((float) numPoints)/numSamples;
+    }
+    
+    /* the curve ends at a control point when t=1  				*/
+    /* because the increment 1.0/numSamples  has finite precision	*/
+    /* t probably won't hit 1.0 exactly, so we force it			*/
+    
+    glEnd();
+    glDisable(GL_LINE_WIDTH);
+}
+
 void display ()
 {
     if (textMode)
@@ -147,6 +191,11 @@ void display ()
     if (currentImageGraph) {
         for (int i = 0; i < currentImageGraph->size(); ++i)
             currentImageGraph->at(i).glDrawPolygonWrapper();
+        if (curveVector) {
+            for (int i = 0; i < curveVector->size(); ++i) {
+                drawCurve(0, curveVector->at(i));
+            }
+        }
     }
     else if (currentImage)
         currentImage->glDrawPixelsWrapper();
