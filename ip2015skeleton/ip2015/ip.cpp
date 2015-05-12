@@ -1283,7 +1283,7 @@ void extractCurveControlPoint(int startIndex,
 }
 
 
-vector<vector<vector<GLfloat>>> extractCurveControlPointStartingAt(int i,
+vector<Curve> extractCurveControlPointStartingAt(int i,
                               int j,
                               int blockSizeX,
                               int blockSizeY,
@@ -1291,9 +1291,12 @@ vector<vector<vector<GLfloat>>> extractCurveControlPointStartingAt(int i,
                               bool startsWithFirst){
     
     vector<vector<vector<GLfloat>>> curveSet = *new vector<vector<vector<GLfloat>>>();
+    vector<Curve>* curves = new vector<Curve>();
     
     vector<vector<GLfloat>> curve1 = *new vector<vector<GLfloat>>();
     vector<vector<GLfloat>> curve2 = *new vector<vector<GLfloat>>();
+    Curve* c1 = new Curve();
+    Curve* c2 = new Curve();
     int firstIndex = -1;
     int secondIndex = -1;
     bool foundFirst = false;
@@ -1315,10 +1318,19 @@ vector<vector<vector<GLfloat>>> extractCurveControlPointStartingAt(int i,
         extractCurveControlPoint(secondIndex, i, j, blockSizeX, blockSizeY, &curve1, &curve2, clockWiseGraph);
     }
     
+    c1->verticies = curve1;
+    c2->verticies = curve2;
+    
+    c1->setColor(currentImageGraph->at(i*blockSizeY+j).color);
+    c2->setColor(currentImageGraph->at(i*blockSizeY+j).color);
+    
     curveSet.push_back(curve1);
     curveSet.push_back(curve2);
     
-    return curveSet;
+    curves->push_back(*c1);
+    curves->push_back(*c2);
+    
+    return *curves;
 }
 
 int startOfCurve(int i, int j, int blockSizeX, int blockSizeY, vector<vector<bool>>* clockWiseGraph){
@@ -1348,37 +1360,45 @@ int startOfCurve(int i, int j, int blockSizeX, int blockSizeY, vector<vector<boo
     return 0;
 }
 
-vector< vector< vector< GLfloat >>> extractControlPoints(vector<vector<bool>>* simplifiedGraph,
+void extractControlPoints(vector<vector<bool>>* simplifiedGraph,
                                                      int blockSizeX,
                                                      int blockSizeY){
     vector<vector<bool>> clockWiseGraph = clockWiseSimplifiedGraph(*simplifiedGraph, blockSizeX, blockSizeY);
-    vector<vector<vector<GLfloat >>> curves = *new vector<vector<vector<GLfloat >>>();
+    //vector<vector<vector<GLfloat >>> curves = *new vector<vector<vector<GLfloat >>>();
     
-    vector<vector<vector<GLfloat>>> currentCurves;
+    //vector<>
+    
+    //vector<vector<vector<GLfloat>>> currentCurves;
+    
+    curveVector = new vector<Curve>();
+    
+    vector<Curve> currentCurves;
     
     for(int i = 0; i<blockSizeX; i++){
         for(int j = 0; j<blockSizeY; j++){
             if(!clockWiseGraph[i*blockSizeY+j][8]){
                 if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==1){
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, true);
-                    curves.push_back(currentCurves[0]);
-                    curves.push_back(currentCurves[1]);
+                    //curves.push_back(currentCurves[0]);
+                    //curves.push_back(currentCurves[1]);
+                    curveVector->push_back(currentCurves[0]);
+                    curveVector->push_back(currentCurves[1]);
                 } else if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==2){
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, false);
-                    curves.push_back(currentCurves[0]);
-                    curves.push_back(currentCurves[1]);
+                    //curves.push_back(currentCurves[0]);
+                    //curves.push_back(currentCurves[1]);
+                    curveVector->push_back(currentCurves[0]);
+                    curveVector->push_back(currentCurves[1]);
                 }
             }
         }
     }
     
-    curveVector = new vector<vector<vector<GLfloat >>>();
-
-    for (int i = 0; i < curves.size(); ++i) {
-        curveVector->push_back(curves[i]);
-    }
     
-    return curves;
+
+    //
+    
+    //return curves;
 }
 
 

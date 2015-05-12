@@ -221,7 +221,7 @@ void display ()
             }
         }
     }
-    if (currentImage)
+    else if (currentImage)
         currentImage->glDrawPixelsWrapper();
     
     // swap buffers
