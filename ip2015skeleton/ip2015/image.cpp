@@ -1014,9 +1014,9 @@ void ImagePixel::glDrawPolygonWrapper ()
         for (int l = 0; l < 2; ++l) {
             vertex[l] = this->vertices[k][l];
         }
-        cout << vertex[0] << "," << vertex[1] << " ";
+        //cout << vertex[0] << "," << vertex[1] << " ";
         glVertex2fv(vertex);
     }
-    cout << endl;
+    //cout << endl;
     glEnd();
 }

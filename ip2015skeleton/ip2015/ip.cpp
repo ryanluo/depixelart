@@ -331,6 +331,52 @@ void getNeighbor(int startX, int startY, int* neighborX, int* neighborY, int ind
     }
 }
 
+void getClockWiseNeighbor(int startX, int startY, int* neighborX, int* neighborY, int index){
+    switch(index){
+        case 0: {
+            *neighborX = startX-1;
+            *neighborY = startY-1;
+            break;
+        }
+        case 1: {
+            *neighborX = startX;
+            *neighborY = startY-1;
+            break;
+        }
+        case 2: {
+            *neighborX = startX+1;
+            *neighborY = startY-1;
+            break;
+        }
+        case 3: {
+            *neighborX = startX+1;
+            *neighborY = startY;
+            break;
+        }
+        case 4: {
+            *neighborX = startX+1;
+            *neighborY = startY+1;
+            break;
+        }
+        case 5: {
+            *neighborX = startX;
+            *neighborY = startY+1;
+            break;
+        }
+        case 6: {
+            *neighborX = startX-1;
+            *neighborY = startY+1;
+            break;
+        }
+        case 7: {
+            *neighborX = startX-1;
+            *neighborY = startY;
+            break;
+        }
+    }
+}
+
+
 int getNeighborIndex(int startIndex, int blockSizeX, int blockSizeY, int neighborIndex){
     int resultIndex = -1;
     switch(neighborIndex){
@@ -1049,10 +1095,10 @@ void extractCurveControlPoint(int startIndex,
                               vector<vector<bool>>* clockWiseGraph){
     //get the end index
     int endIndex = -1;
-    for(int i = 0; i < 8; i++){
-        if(clockWiseGraph->at(i*blockSizeY+j)[i]){
-            if(i != startIndex){
-                endIndex = i;
+    for(int x = 0; x < 8; x++){
+        if(clockWiseGraph->at(i*blockSizeY+j)[x]){
+            if(x != startIndex){
+                endIndex = x;
                 break;
             }
         }
@@ -1140,7 +1186,9 @@ void extractCurveControlPoint(int startIndex,
         }else{
             nextStart = endIndex + 4;
         }
-        extractCurveControlPoint(nextStart, getClockWiseNeighborX(i, endIndex), getClockWiseNeighborY(j, endIndex), blockSizeX, blockSizeY, curve1, curve2, clockWiseGraph);
+        int nextI = getClockWiseNeighborX(i, endIndex);
+        int nextJ = getClockWiseNeighborY(j, endIndex);
+        extractCurveControlPoint(nextStart, nextI, nextJ, blockSizeX, blockSizeY, curve1, curve2, clockWiseGraph);
     }
 }
 
@@ -1160,12 +1208,12 @@ vector<vector<vector<GLfloat>>> extractCurveControlPointStartingAt(int i,
     int secondIndex = -1;
     bool foundFirst = false;
     //get first and second connection
-    for(int i = 0; i < 8; i++){
-        if(clockWiseGraph->at(i*blockSizeY+j)[i]){
+    for(int x = 0; x < 8; x++){
+        if(clockWiseGraph->at(i*blockSizeY+j)[x]){
             if(foundFirst){
-                secondIndex = i;
+                secondIndex = x;
             }else{
-                firstIndex = i;
+                firstIndex = x;
                 foundFirst = true;
             }
         }
@@ -1189,15 +1237,18 @@ int startOfCurve(int i, int j, int blockSizeX, int blockSizeY, vector<vector<boo
         bool foundFirst = false;
         int firstIndex = -1;
         int secondIndex = -1;
-        for(int i = 0; i<8; i++){
-            if(neighbors[i]){
+        for(int x = 0; x<8; x++){
+            if(neighbors[x]){
                 if(foundFirst){
-                    secondIndex = i;
+                    secondIndex = x;
                 }else{
-                    firstIndex = i;
+                    firstIndex = x;
+                    foundFirst = true;
                 }
             }
         }
+        cout<<"first"<<firstIndex<<endl;
+        cout<<"second"<<secondIndex<<endl;
         int firstConnectedIndex = getClockWiseNeighborIndex(firstIndex, i, j, blockSizeY, blockSizeX);
         int secondConnectedIndex = getClockWiseNeighborIndex(secondIndex, i, j, blockSizeY, blockSizeX);
         if(getClockWiseNodeDegree(clockWiseGraph->at(firstConnectedIndex))!= 2){
@@ -1209,8 +1260,7 @@ int startOfCurve(int i, int j, int blockSizeX, int blockSizeY, vector<vector<boo
     return 0;
 }
 
-vector< vector< vector< GLfloat >>> extractControlPoints(ImageGraph* imageGraph,
-                                                     vector<vector<bool>>* simplifiedGraph,
+vector< vector< vector< GLfloat >>> extractControlPoints(vector<vector<bool>>* simplifiedGraph,
                                                      int blockSizeX,
                                                      int blockSizeY){
     vector<vector<bool>> clockWiseGraph = clockWiseSimplifiedGraph(*simplifiedGraph, blockSizeX, blockSizeY);
@@ -1221,12 +1271,15 @@ vector< vector< vector< GLfloat >>> extractControlPoints(ImageGraph* imageGraph,
     
     for(int i = 0; i<blockSizeX; i++){
         for(int j = 0; j<blockSizeY; j++){
-            if(clockWiseGraph[i*blockSizeY+j][8]){
+            if(!clockWiseGraph[i*blockSizeY+j][8]){
+                cout<<"not visited"<<endl;
                 if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==1){
+                    cout<<"in curve"<<endl;
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, true);
                     curves.push_back(currentCurves[0]);
                     curves.push_back(currentCurves[1]);
                 }else if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==2){
+                    
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, false);
                     curves.push_back(currentCurves[0]);
                     curves.push_back(currentCurves[1]);
@@ -1371,14 +1424,17 @@ Image* ip_misc(Image* src,
 //    }
 //
     vector<vector<bool>> simplifiedGraph = simplifiedSimilarityGraph(*similarityGraph, blockSizeX, blockSizeY);
+    
+    //vector<vector<bool>> clockWiseGraph = clockWiseSimplifiedGraph(simplifiedGraph, blockSizeX, blockSizeY);
+    extractControlPoints(&simplifiedGraph, blockSizeX, blockSizeY);
 //    //vector<vector<bool>> simplifiedGraph = *similarityGraph;
 //    for(int i = 0; i<blockSizeX; ++i){
 //        for(int j = 0; j<blockSizeY; ++j){
 //            for(int k = 0; k<8; ++k){
-//                if(simplifiedGraph[i*blockSizeY+j][k]){
+//                if(clockWiseGraph[i*blockSizeY+j][k]){
 //                    int endX = i;
 //                    int endY = j;
-//                    getNeighbor(i, j, &endX, &endY, k);
+//                    getClockWiseNeighbor(i, j, &endX, &endY, k);
 //                    //reshapePixels(similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
 //                    drawEdge(i, j, endX, endY, pixelSize, *rawGraphTest);
 //                }
