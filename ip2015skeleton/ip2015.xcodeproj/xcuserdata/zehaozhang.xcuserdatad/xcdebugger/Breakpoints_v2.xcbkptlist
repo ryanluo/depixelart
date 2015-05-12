@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ip2015/ip.cpp"
-            timestampString = "452492100.442065"
+            timestampString = "452747891.180959"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "759"
-            endingLineNumber = "759"
-            landmarkName = "ip_misc(Image* src, ImageGraph* imageGraph, vector&lt;vector&lt;bool&gt;&gt;* similarityGraph, const int blockSizeX, const int blockSizeY, const int pixelSize)"
+            startingLineNumber = "806"
+            endingLineNumber = "806"
+            landmarkName = "clockWiseSimplifiedGraph(vector&lt;vector&lt;bool&gt;&gt; &amp;simplifiedGraph, int blockSizeX, int blockSizeY)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,12 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ip2015/ip.cpp"
-            timestampString = "452492100.442065"
+            timestampString = "452747891.180959"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "850"
-            endingLineNumber = "850"
-            landmarkName = "ip_misc(Image* src, ImageGraph* imageGraph, vector&lt;vector&lt;bool&gt;&gt;* similarityGraph, const int blockSizeX, const int blockSizeY, const int pixelSize)"
+            startingLineNumber = "897"
+            endingLineNumber = "897"
+            landmarkName = "extractCounterClockWiseHalf(int i, int j, int blockSizeX, int blockSizeY, int index)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -42,58 +42,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ip2015/ip.cpp"
-            timestampString = "452492100.442065"
+            timestampString = "452748118.995685"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "889"
-            endingLineNumber = "889">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ip2015/ip.cpp"
-            timestampString = "452492125.987339"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "665"
-            endingLineNumber = "665"
-            landmarkName = "reshapePixelGl(int i, int j, vector&lt;bool&gt; adjList, ImageGraph* src, int blockSizeX, int blockSizeY, int pixelSize)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ip2015/ip.cpp"
-            timestampString = "452492341.490774"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "664"
-            endingLineNumber = "664"
-            landmarkName = "reshapePixelGl(int i, int j, vector&lt;bool&gt; adjList, ImageGraph* src, int blockSizeX, int blockSizeY, int pixelSize)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ip2015/ip.cpp"
-            timestampString = "452492343.978892"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "666"
-            endingLineNumber = "666"
-            landmarkName = "reshapePixelGl(int i, int j, vector&lt;bool&gt; adjList, ImageGraph* src, int blockSizeX, int blockSizeY, int pixelSize)"
+            startingLineNumber = "938"
+            endingLineNumber = "938"
+            landmarkName = "extractCounterClockWiseHalf(int i, int j, int blockSizeX, int blockSizeY, int index)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

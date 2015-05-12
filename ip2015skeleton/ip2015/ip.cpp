@@ -738,6 +738,507 @@ void reshapePixelsGl(vector< vector<bool> > &similarityGraph,
 
 }
 
+vector<vector<bool>> simplifiedSimilarityGraph(vector<vector<bool>> &similarityGraph,
+                                               int blockSizeX,
+                                               int blockSizeY){
+    vector<vector<bool>> simplifiedGraph = similarityGraph;
+    for(int i = 0; i<blockSizeX; i++){
+        for(int j = 0; j<blockSizeY; j++){
+            if(simplifiedGraph[i*blockSizeY+j][1]){
+                if(similarityGraph[i*blockSizeY+j][3] && similarityGraph[i*blockSizeY+j][4]){
+                    simplifiedGraph[i*blockSizeY+j][1] = false;
+                    simplifiedGraph[i*blockSizeY+j-1][6] = false;
+                }else if(similarityGraph[i*blockSizeY+j-1][3] && similarityGraph[i*blockSizeY+j-1][4]){
+                    simplifiedGraph[i*blockSizeY+j][1] = false;
+                    simplifiedGraph[i*blockSizeY+j-1][6] = false;
+                }
+            }
+            if(simplifiedGraph[i*blockSizeY+j][3]){
+                if(similarityGraph[i*blockSizeY+j][1] && similarityGraph[i*blockSizeY+j][6]){
+                    simplifiedGraph[i*blockSizeY+j][3] = false;
+                    simplifiedGraph[(i-1)*blockSizeY+j][4] = false;
+                }else if(similarityGraph[(i-1)*blockSizeY+j][1] && similarityGraph[(i-1)*blockSizeY+j][6]){
+                    simplifiedGraph[i*blockSizeY+j][3] = false;
+                    simplifiedGraph[(i-1)*blockSizeY+j][4] = false;
+                }
+            }
+//            if(simplifiedGraph[i*blockSizeY+j][4]){
+//                if(similarityGraph[i*blockSizeY+j][1] && similarityGraph[i*blockSizeX+j][6]){
+//                    simplifiedGraph[i*blockSizeY+j][4] = false;
+//                    simplifiedGraph[(i+1)*blockSizeY+j][3] = false;
+//                }else if(similarityGraph[(i+1)*blockSizeY+j][1] && similarityGraph[(i+1)*blockSizeX+j][6]){
+//                    simplifiedGraph[i*blockSizeY+j][4] = false;
+//                    simplifiedGraph[(i+1)*blockSizeY+j][3] = false;
+//                }
+//            }
+//            if(simplifiedGraph[i*blockSizeY+j][6]){
+//                if(similarityGraph[i*blockSizeY+j][3] && similarityGraph[i*blockSizeX+j][4]){
+//                    simplifiedGraph[i*blockSizeY+j][6] = false;
+//                    simplifiedGraph[i*blockSizeY+j+1][1] = false;
+//                }else if(similarityGraph[i*blockSizeY+j+1][3] && similarityGraph[i*blockSizeX+j+1][4]){
+//                    simplifiedGraph[i*blockSizeY+j][6] = false;
+//                    simplifiedGraph[i*blockSizeY+j+1][1] = false;
+//                }
+//            }
+        }
+    }
+    return simplifiedGraph;
+}
+
+
+int getClockWiseNodeDegree(vector<bool> & neighbors) {
+    int total = 0;
+    for (int i = 0; i < 8; ++i) {
+        if (neighbors[i]) ++total;
+    }
+    return total;
+}
+
+
+vector< vector<bool>> clockWiseSimplifiedGraph(vector<vector<bool>> &simplifiedGraph, int blockSizeX, int blockSizeY){
+    vector<vector<bool>> clockWiseGraph = *new vector<vector<bool>>(blockSizeX * blockSizeY, vector<bool>(9,false));
+    for(int i = 0; i < blockSizeX; i++){
+        for(int j = 0; j < blockSizeY; j++){
+            clockWiseGraph[i*blockSizeY+j][0] = simplifiedGraph[i*blockSizeY+j][0];
+            clockWiseGraph[i*blockSizeY+j][1] = simplifiedGraph[i*blockSizeY+j][1];
+            clockWiseGraph[i*blockSizeY+j][2] = simplifiedGraph[i*blockSizeY+j][2];
+            clockWiseGraph[i*blockSizeY+j][3] = simplifiedGraph[i*blockSizeY+j][4];
+            clockWiseGraph[i*blockSizeY+j][4] = simplifiedGraph[i*blockSizeY+j][7];
+            clockWiseGraph[i*blockSizeY+j][5] = simplifiedGraph[i*blockSizeY+j][6];
+            clockWiseGraph[i*blockSizeY+j][6] = simplifiedGraph[i*blockSizeY+j][5];
+            clockWiseGraph[i*blockSizeY+j][7] = simplifiedGraph[i*blockSizeY+j][3];
+            clockWiseGraph[i*blockSizeY+j][8] = false;
+        }
+    }
+    return clockWiseGraph;
+}
+
+vector<vector<GLfloat>> extractClockWiseHalf(int i,
+                                         int j,
+                                         int blockSizeX,
+                                         int blockSizeY,
+                                         int index){
+    ImagePixel* p = &currentImageGraph->at(i*blockSizeY+j);
+    
+    vector<vector<GLfloat>> clockWiseHalf = *new vector<vector<GLfloat>>(4, vector<GLfloat>(2, -1));
+    
+    switch (i){
+        case 0:{
+            clockWiseHalf[0] = p->vertices[0];
+            clockWiseHalf[1] = p->vertices[7];
+            clockWiseHalf[2] = p->vertices[6];
+            clockWiseHalf[3] = p->vertices[5];
+            break;
+        }
+        case 1:{
+            clockWiseHalf[0] = p->vertices[7];
+            clockWiseHalf[1] = p->vertices[6];
+            clockWiseHalf[2] = p->vertices[5];
+            clockWiseHalf[3] = p->vertices[4];
+            break;
+        }
+        case 2:{
+            clockWiseHalf[0] = p->vertices[6];
+            clockWiseHalf[1] = p->vertices[5];
+            clockWiseHalf[2] = p->vertices[4];
+            clockWiseHalf[3] = p->vertices[3];
+            break;
+        }
+        case 3:{
+            clockWiseHalf[0] = p->vertices[5];
+            clockWiseHalf[1] = p->vertices[4];
+            clockWiseHalf[2] = p->vertices[3];
+            clockWiseHalf[3] = p->vertices[2];
+            break;
+        }
+        case 4:{
+            clockWiseHalf[0] = p->vertices[4];
+            clockWiseHalf[1] = p->vertices[3];
+            clockWiseHalf[2] = p->vertices[2];
+            clockWiseHalf[3] = p->vertices[1];
+            break;
+        }
+        case 5:{
+            clockWiseHalf[0] = p->vertices[3];
+            clockWiseHalf[1] = p->vertices[2];
+            clockWiseHalf[2] = p->vertices[1];
+            clockWiseHalf[3] = p->vertices[0];
+            break;
+        }
+        case 6:{
+            clockWiseHalf[0] = p->vertices[2];
+            clockWiseHalf[1] = p->vertices[1];
+            clockWiseHalf[2] = p->vertices[0];
+            clockWiseHalf[3] = p->vertices[7];
+            break;
+        }
+        case 7:{
+            clockWiseHalf[0] = p->vertices[1];
+            clockWiseHalf[1] = p->vertices[0];
+            clockWiseHalf[2] = p->vertices[7];
+            clockWiseHalf[3] = p->vertices[6];
+            break;
+        }
+        
+    }
+    
+    
+    return clockWiseHalf;
+}
+
+
+vector<vector<GLfloat>> extractCounterClockWiseHalf(int i,
+                                             int j,
+                                             int blockSizeX,
+                                             int blockSizeY,
+                                             int index){
+    ImagePixel* p = &currentImageGraph->at(i*blockSizeY+j);
+    
+    vector<vector<GLfloat>> counterClockWiseHalf = *new vector<vector<GLfloat>>(4, vector<GLfloat>(2, -1));
+    
+    switch (i){
+        case 0:{
+            counterClockWiseHalf[0] = p->vertices[1];
+            counterClockWiseHalf[1] = p->vertices[2];
+            counterClockWiseHalf[2] = p->vertices[3];
+            counterClockWiseHalf[3] = p->vertices[4];
+            break;
+        }
+        case 1:{
+            counterClockWiseHalf[0] = p->vertices[0];
+            counterClockWiseHalf[1] = p->vertices[1];
+            counterClockWiseHalf[2] = p->vertices[2];
+            counterClockWiseHalf[3] = p->vertices[3];
+            break;
+        }
+        case 2:{
+            counterClockWiseHalf[0] = p->vertices[7];
+            counterClockWiseHalf[1] = p->vertices[0];
+            counterClockWiseHalf[2] = p->vertices[1];
+            counterClockWiseHalf[3] = p->vertices[2];
+            break;
+        }
+        case 3:{
+            counterClockWiseHalf[0] = p->vertices[6];
+            counterClockWiseHalf[1] = p->vertices[7];
+            counterClockWiseHalf[2] = p->vertices[0];
+            counterClockWiseHalf[3] = p->vertices[1];
+            break;
+        }
+        case 4:{
+            counterClockWiseHalf[0] = p->vertices[5];
+            counterClockWiseHalf[1] = p->vertices[6];
+            counterClockWiseHalf[2] = p->vertices[7];
+            counterClockWiseHalf[3] = p->vertices[0];
+            break;
+        }
+        case 5:{
+            counterClockWiseHalf[0] = p->vertices[4];
+            counterClockWiseHalf[1] = p->vertices[5];
+            counterClockWiseHalf[2] = p->vertices[6];
+            counterClockWiseHalf[3] = p->vertices[7];
+            break;
+        }
+        case 6:{
+            counterClockWiseHalf[0] = p->vertices[3];
+            counterClockWiseHalf[1] = p->vertices[4];
+            counterClockWiseHalf[2] = p->vertices[5];
+            counterClockWiseHalf[3] = p->vertices[6];
+            break;
+        }
+        case 7:{
+            counterClockWiseHalf[0] = p->vertices[2];
+            counterClockWiseHalf[1] = p->vertices[3];
+            counterClockWiseHalf[2] = p->vertices[4];
+            counterClockWiseHalf[3] = p->vertices[5];
+            break;
+        }
+            
+    }
+    
+    
+    return counterClockWiseHalf;
+}
+
+
+int getClockWiseNeighborIndex(int index, int i, int j, int blockSizeY, int blockSizeX){
+    int newIndex = -1;
+    switch(index){
+        case 0:{
+            newIndex = (i-1)*blockSizeY+(j-1);
+            break;
+        }
+            
+        case 1:{
+            newIndex = i*blockSizeY + (j-1);
+            break;
+        }
+            
+        case 2:{
+            newIndex = (i+1)*blockSizeY + (j-1);
+            break;
+        }
+            
+        case 3:{
+            newIndex = (i+1)*blockSizeY + j;
+            break;
+        }
+            
+        case 4:{
+            newIndex = (i+1)*blockSizeY + (j+1);
+            break;
+        }
+            
+        case 5:{
+            newIndex = i*blockSizeY + (j+1);
+            break;
+        }
+            
+        case 6:{
+            newIndex = (i-1)*blockSizeY + (j+1);
+            break;
+        }
+            
+        case 7:{
+            newIndex = (i-1)*blockSizeY + j;
+            break;
+        }
+    }
+    return newIndex;
+}
+
+int getClockWiseNeighborX(int i, int index){
+    if(index == 1 || index == 5){
+        return i;
+    }else if(index == 0 || index == 7 || index == 6){
+        return i-1;
+    }else{
+        return i+1;
+    }
+}
+
+int getClockWiseNeighborY(int j, int index){
+    if(index == 3 || index == 7){
+        return j;
+    }else if(index == 0 || index == 1 || index == 2){
+        return j-1;
+    }else{
+        return j+1;
+    }
+}
+
+bool contains(vector<GLfloat> vertex, vector<vector<GLfloat>> array){
+    for(int i = 0; i < array.size(); i++){
+        if(vertex[0] == array[i][0] && vertex[1] == array[i][1]){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+//extract control points recursively
+//extremely long code(may be able to use while loop)
+void extractCurveControlPoint(int startIndex,
+                              int i,
+                              int j,
+                              int blockSizeX,
+                              int blockSizeY,
+                              vector<vector<GLfloat>>* curve1,
+                              vector<vector<GLfloat>>* curve2,
+                              vector<vector<bool>>* clockWiseGraph){
+    //get the end index
+    int endIndex = -1;
+    for(int i = 0; i < 8; i++){
+        if(clockWiseGraph->at(i*blockSizeY+j)[i]){
+            if(i != startIndex){
+                endIndex = i;
+                break;
+            }
+        }
+    }
+    
+    //extract the four halves of vertices
+    vector<vector<GLfloat>> startClockWiseHalf = extractClockWiseHalf(i, j, blockSizeX, blockSizeY, startIndex);
+    vector<vector<GLfloat>> startCounterClockWiseHalf = extractCounterClockWiseHalf(i, j, blockSizeX, blockSizeY, startIndex);
+    vector<vector<GLfloat>> endClockWiseHalf = extractClockWiseHalf(i, j, blockSizeX, blockSizeY, endIndex);
+    vector<vector<GLfloat>> endCounterClockWiseHalf = extractCounterClockWiseHalf(i, j, blockSizeX, blockSizeY, endIndex);
+    
+    
+    if(startIndex > endIndex){
+        if(startIndex - endIndex > 4){
+            //put the intersection of the clockWiseHalf of start and the counterClockWiseHalf of end into curve1
+            for(int i = 0; i < 4; i++){
+                if(contains(startClockWiseHalf[i], endCounterClockWiseHalf)){
+                    curve1->push_back(startClockWiseHalf[i]);
+                }
+            }
+            //put the union of the counterClockWiseHalf of start and the clockWiseHalf of end into curve2
+            for(int i = 0; i < 4; i++){
+                curve2->push_back(startCounterClockWiseHalf[i]);
+            }
+            for(int i = 3; i >= 0; i--){
+                if(!contains(endClockWiseHalf[i], startCounterClockWiseHalf)){
+                    curve2->push_back(endClockWiseHalf[i]);
+                }
+            }
+        }else{
+            for(int i = 0; i < 4; i++){
+                if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
+                    curve2->push_back(startCounterClockWiseHalf[i]);
+                }
+            }
+            for(int i = 0; i < 4; i++){
+                curve1->push_back(startClockWiseHalf[i]);
+            }
+            for(int i = 3; i >= 0; i--){
+                if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
+                    curve1->push_back(endCounterClockWiseHalf[i]);
+                }
+            }
+        }
+    }else{
+        if(endIndex - startIndex > 4){
+            for(int i = 0; i < 4; i++){
+                if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
+                    curve2->push_back(startCounterClockWiseHalf[i]);
+                }
+            }
+            for(int i = 0; i < 4; i++){
+                curve1->push_back(startClockWiseHalf[i]);
+            }
+            for(int i = 3; i >= 0; i--){
+                if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
+                    curve1->push_back(endCounterClockWiseHalf[i]);
+                }
+            }
+        }else{
+            for(int i = 0; i < 4; i++){
+                if(contains(startClockWiseHalf[i], endCounterClockWiseHalf)){
+                    curve1->push_back(startClockWiseHalf[i]);
+                }
+            }
+            for(int i = 0; i < 4; i++){
+                curve2->push_back(startCounterClockWiseHalf[i]);
+            }
+            for(int i = 3; i >= 0; i--){
+                if(!contains(endClockWiseHalf[i], startCounterClockWiseHalf)){
+                    curve2->push_back(endClockWiseHalf[i]);
+                }
+            }
+        }
+    }
+    //set visited to be true
+    clockWiseGraph->at(i*blockSizeY+j)[8] = true;
+    //get the next node
+    int nextIndex = getClockWiseNeighborIndex(endIndex, i, j, blockSizeY, blockSizeX);
+    //if the next node is also of valence 2, recursively extract the control points out of that as well
+    if(getClockWiseNodeDegree(clockWiseGraph->at(nextIndex)) == 2){
+        int nextStart = -1;
+        if(endIndex>3){
+            nextStart = endIndex - 4;
+        }else{
+            nextStart = endIndex + 4;
+        }
+        extractCurveControlPoint(nextStart, getClockWiseNeighborX(i, endIndex), getClockWiseNeighborY(j, endIndex), blockSizeX, blockSizeY, curve1, curve2, clockWiseGraph);
+    }
+}
+
+
+vector<vector<vector<GLfloat>>> extractCurveControlPointStartingAt(int i,
+                              int j,
+                              int blockSizeX,
+                              int blockSizeY,
+                              vector<vector<bool>>* clockWiseGraph,
+                              bool startsWithFirst){
+    
+    vector<vector<vector<GLfloat>>> curveSet = *new vector<vector<vector<GLfloat>>>();
+    
+    vector<vector<GLfloat>> curve1 = *new vector<vector<GLfloat>>();
+    vector<vector<GLfloat>> curve2 = *new vector<vector<GLfloat>>();
+    int firstIndex = -1;
+    int secondIndex = -1;
+    bool foundFirst = false;
+    //get first and second connection
+    for(int i = 0; i < 8; i++){
+        if(clockWiseGraph->at(i*blockSizeY+j)[i]){
+            if(foundFirst){
+                secondIndex = i;
+            }else{
+                firstIndex = i;
+                foundFirst = true;
+            }
+        }
+    }
+    
+    if(startsWithFirst){
+        extractCurveControlPoint(firstIndex, i, j, blockSizeX, blockSizeY, &curve1, &curve2, clockWiseGraph);
+    }else{
+        extractCurveControlPoint(secondIndex, i, j, blockSizeX, blockSizeY, &curve1, &curve2, clockWiseGraph);
+    }
+    
+    curveSet.push_back(curve1);
+    curveSet.push_back(curve2);
+    
+    return curveSet;
+}
+
+int startOfCurve(int i, int j, int blockSizeX, int blockSizeY, vector<vector<bool>>* clockWiseGraph){
+    vector<bool> neighbors = clockWiseGraph->at(i*blockSizeY+j);
+    if(getClockWiseNodeDegree(neighbors) == 2){
+        bool foundFirst = false;
+        int firstIndex = -1;
+        int secondIndex = -1;
+        for(int i = 0; i<8; i++){
+            if(neighbors[i]){
+                if(foundFirst){
+                    secondIndex = i;
+                }else{
+                    firstIndex = i;
+                }
+            }
+        }
+        int firstConnectedIndex = getClockWiseNeighborIndex(firstIndex, i, j, blockSizeY, blockSizeX);
+        int secondConnectedIndex = getClockWiseNeighborIndex(secondIndex, i, j, blockSizeY, blockSizeX);
+        if(getClockWiseNodeDegree(clockWiseGraph->at(firstConnectedIndex))!= 2){
+            return 1;
+        }else if(getClockWiseNodeDegree(clockWiseGraph->at(secondConnectedIndex))!= 2){
+            return 2;
+        }
+    }
+    return 0;
+}
+
+vector< vector< vector< GLfloat >>> extractControlPoints(ImageGraph* imageGraph,
+                                                     vector<vector<bool>>* simplifiedGraph,
+                                                     int blockSizeX,
+                                                     int blockSizeY){
+    vector<vector<bool>> clockWiseGraph = clockWiseSimplifiedGraph(*simplifiedGraph, blockSizeX, blockSizeY);
+    
+    vector<vector<vector<GLfloat >>> curves = *new vector<vector<vector<GLfloat >>>();
+    
+    vector<vector<vector<GLfloat>>> currentCurves;
+    
+    for(int i = 0; i<blockSizeX; i++){
+        for(int j = 0; j<blockSizeY; j++){
+            if(clockWiseGraph[i*blockSizeY+j][8]){
+                if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==1){
+                    currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, true);
+                    curves.push_back(currentCurves[0]);
+                    curves.push_back(currentCurves[1]);
+                }else if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==2){
+                    currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, false);
+                    curves.push_back(currentCurves[0]);
+                    curves.push_back(currentCurves[1]);
+                }
+            }
+        }
+    }
+    
+    
+    return curves;
+}
+
 
 
 /*
@@ -868,11 +1369,13 @@ Image* ip_misc(Image* src,
 //        }
     
 //    }
-//    
+//
+    vector<vector<bool>> simplifiedGraph = simplifiedSimilarityGraph(*similarityGraph, blockSizeX, blockSizeY);
+//    //vector<vector<bool>> simplifiedGraph = *similarityGraph;
 //    for(int i = 0; i<blockSizeX; ++i){
 //        for(int j = 0; j<blockSizeY; ++j){
 //            for(int k = 0; k<8; ++k){
-//                if(similarityGraph->at(i*blockSizeY+j)[k]){
+//                if(simplifiedGraph[i*blockSizeY+j][k]){
 //                    int endX = i;
 //                    int endY = j;
 //                    getNeighbor(i, j, &endX, &endY, k);
@@ -882,7 +1385,7 @@ Image* ip_misc(Image* src,
 //            }
 //        }
 //        
- //   }
+//    }
     
     return rawGraphTest;
 }

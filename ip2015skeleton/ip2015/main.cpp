@@ -152,6 +152,7 @@ void display ()
         currentImage->glDrawPixelsWrapper();
     
     // swap buffers
+    //currentImage->glDrawPixelsWrapper();
     glutSwapBuffers();
 }
 
