@@ -196,10 +196,10 @@ void display ()
         for (int i = 0; i < currentImageGraph->size(); ++i)
             currentImageGraph->at(i).glDrawPolygonWrapper();
         if (curveVector) {
-            //for (int i = 0; i < curveVector->size(); ++i) {
-                //drawCurve(0, curveVector->at(i));
-            //}
-            drawCurve(0, curveVector->at(37));
+            for (int i = 0; i < curveVector->size(); ++i) {
+                drawCurve(0, curveVector->at(i));
+            }
+            //drawCurve(0, curveVector->at(37));
         }
     }
     else if (currentImage)
