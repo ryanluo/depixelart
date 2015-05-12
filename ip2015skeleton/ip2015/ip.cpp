@@ -1082,6 +1082,43 @@ bool contains(vector<GLfloat> vertex, vector<vector<GLfloat>> array){
     return false;
 }
 
+bool startClockWiseVisible(int i, int j, int blockSizeX, int blockSizeY, int index,vector<vector<bool>>* clockWiseGraph){
+    
+    return true;
+//    ImagePixel* p = &currentImageGraph->at(i*blockSizeY+j);
+//    
+//    int neighborX = getClockWiseNeighborX(i, index+2 % 8);
+//    int neighborY = getClockWiseNeighborY(j, index+2 % 8);
+//    if(neighborX < 0 || neighborX >= blockSizeX || neighborY < 0 || neighborY >= blockSizeY){
+//        return false;
+//    }
+//    else{
+//        int neighborIndex = getClockWiseNeighborIndex((index+2 % 8), i, j, blockSizeY, blockSizeX);
+//        ImagePixel* neighbor = &currentImageGraph->at(neighborIndex);
+//        Pixel currentPixel = p->getPixel();
+//        Pixel neighborPixel = neighbor->getPixel();
+//        return !comparePixel(currentPixel, neighborPixel);
+//    }
+    
+}
+
+bool startCounterClockWiseVisible(int i, int j, int blockSizeX, int blockSizeY, int index, vector<vector<bool>>* clockWiseGraph){
+    return true;
+//    ImagePixel* p = &currentImageGraph->at(i*blockSizeY+j);
+//    int neighborX = getClockWiseNeighborX(i, index-2 % 8);
+//    int neighborY = getClockWiseNeighborY(j, index-2 % 8);
+//    if(neighborX < 0 || neighborX >= blockSizeX || neighborY < 0 || neighborY >= blockSizeY){
+//        return false;
+//    }else{
+//        ImagePixel* neighbor = &currentImageGraph->at(getClockWiseNeighborIndex((index-2 % 8), i, j, blockSizeY, blockSizeX));
+//        Pixel currentPixel = p->getPixel();
+//        Pixel neighborPixel = neighbor->getPixel();
+//        return !comparePixel(currentPixel, neighborPixel);
+//
+//    }
+}
+
+
 
 //extract control points recursively
 //extremely long code(may be able to use while loop)
@@ -1118,66 +1155,113 @@ void extractCurveControlPoint(int startIndex,
     
     if(startIndex > endIndex){
         if(startIndex - endIndex > 4){
-            //put the intersection of the clockWiseHalf of start and the counterClockWiseHalf of end into curve1
-            for(int i = 0; i < 4; i++){
-                curve1->push_back(startClockWiseHalf[i]);
-            }
-            for(int i = 3; i >= 0; i--){
-                if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
-                    curve1->push_back(endCounterClockWiseHalf[i]);
+            if(startClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(contains(startClockWiseHalf[i], endCounterClockWiseHalf)){
+                        if(!contains(startClockWiseHalf[i], *curve1)){
+                            curve1->push_back(startClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
-            //put the union of the counterClockWiseHalf of start and the clockWiseHalf of end into curve2
-            for(int i = 0; i < 4; i++){
-                if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
-                    curve2->push_back(startCounterClockWiseHalf[i]);
+            if(startCounterClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(!contains(startCounterClockWiseHalf[i], *curve2)){
+                        curve2->push_back(startCounterClockWiseHalf[i]);
+                    }
+                }
+                for(int i = 3; i >= 0; i--){
+                    if(!contains(endClockWiseHalf[i], startCounterClockWiseHalf)){
+                        if(!contains(endClockWiseHalf[i], *curve2)){
+                            curve2->push_back(endClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
             
         }else{
-            for(int i = 0; i < 4; i++){
-                if(contains(startClockWiseHalf[i], endCounterClockWiseHalf)){
-                    curve1->push_back(startClockWiseHalf[i]);
+            //put the intersection of the clockWiseHalf of start and the counterClockWiseHalf of end into curve1
+            if(startClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(!contains(startClockWiseHalf[i], *curve1)){
+                        curve1->push_back(startClockWiseHalf[i]);
+                    }
+                }
+                for(int i = 3; i >= 0; i--){
+                    if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
+                        if(!contains(endCounterClockWiseHalf[i], *curve1)){
+                            curve1->push_back(endCounterClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
-            for(int i = 0; i < 4; i++){
-                curve2->push_back(startCounterClockWiseHalf[i]);
-            }
-            for(int i = 3; i >= 0; i--){
-                if(!contains(endClockWiseHalf[i], startCounterClockWiseHalf)){
-                    curve2->push_back(endClockWiseHalf[i]);
+            
+            //put the union of the counterClockWiseHalf of start and the clockWiseHalf of end into curve2
+            if(startCounterClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
+                        if(!contains(startCounterClockWiseHalf[i], *curve2)){
+                            curve2->push_back(startCounterClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
+            
+            
         }
     }else{
         if(endIndex - startIndex > 4){
-            for(int i = 0; i < 4; i++){
-                if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
-                    curve2->push_back(startCounterClockWiseHalf[i]);
+            if(startCounterClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
+                        if(!contains(startCounterClockWiseHalf[i], *curve2)){
+                            curve2->push_back(startCounterClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
-            for(int i = 0; i < 4; i++){
-                curve1->push_back(startClockWiseHalf[i]);
-            }
-            for(int i = 3; i >= 0; i--){
-                if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
-                    curve1->push_back(endCounterClockWiseHalf[i]);
+            
+            if(startClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(!contains(startClockWiseHalf[i], *curve1)){
+                        curve1->push_back(startClockWiseHalf[i]);
+                    }
+                }
+                for(int i = 3; i >= 0; i--){
+                    if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
+                        if(!contains(endCounterClockWiseHalf[i], *curve1)){
+                            curve1->push_back(endCounterClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
+            
         }else{
-            for(int i = 0; i < 4; i++){
-                if(contains(startClockWiseHalf[i], endCounterClockWiseHalf)){
-                    curve1->push_back(startClockWiseHalf[i]);
+            if(startClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(contains(startClockWiseHalf[i], endCounterClockWiseHalf)){
+                        if(!contains(startClockWiseHalf[i], *curve1)){
+                            curve1->push_back(startClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
-            for(int i = 0; i < 4; i++){
-                curve2->push_back(startCounterClockWiseHalf[i]);
-            }
-            for(int i = 3; i >= 0; i--){
-                if(!contains(endClockWiseHalf[i], startCounterClockWiseHalf)){
-                    curve2->push_back(endClockWiseHalf[i]);
+            
+            if(startCounterClockWiseVisible(i, j, blockSizeX, blockSizeY, startIndex, clockWiseGraph)){
+                for(int i = 0; i < 4; i++){
+                    if(!contains(startCounterClockWiseHalf[i], *curve2)){
+                        curve2->push_back(startCounterClockWiseHalf[i]);
+                    }
+                }
+                for(int i = 3; i >= 0; i--){
+                    if(!contains(endClockWiseHalf[i], startCounterClockWiseHalf)){
+                        if(!contains(endClockWiseHalf[i], *curve2)){
+                            curve2->push_back(endClockWiseHalf[i]);
+                        }
+                    }
                 }
             }
+            
         }
     }
     //set visited to be true
@@ -1432,20 +1516,20 @@ Image* ip_misc(Image* src,
     
     extractControlPoints(&simplifiedGraph, blockSizeX, blockSizeY);
 //    //vector<vector<bool>> simplifiedGraph = *similarityGraph;
-//    for(int i = 0; i<blockSizeX; ++i){
-//        for(int j = 0; j<blockSizeY; ++j){
-//            for(int k = 0; k<8; ++k){
-//                if(clockWiseGraph[i*blockSizeY+j][k]){
-//                    int endX = i;
-//                    int endY = j;
-//                    getClockWiseNeighbor(i, j, &endX, &endY, k);
-//                    //reshapePixels(similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
-//                    drawEdge(i, j, endX, endY, pixelSize, *rawGraphTest);
-//                }
-//            }
-//        }
-//        
-//    }
+    for(int i = 0; i<blockSizeX; ++i){
+        for(int j = 0; j<blockSizeY; ++j){
+            for(int k = 0; k<8; ++k){
+                if(simplifiedGraph[i*blockSizeY+j][k]){
+                    int endX = i;
+                    int endY = j;
+                    getNeighbor(i, j, &endX, &endY, k);
+                    //reshapePixels(similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
+                    drawEdge(i, j, endX, endY, pixelSize, *rawGraphTest);
+                }
+            }
+        }
+        
+    }
     
     return rawGraphTest;
 }
