@@ -868,7 +868,7 @@ vector<vector<GLfloat>> extractClockWiseHalf(int i,
     
     vector<vector<GLfloat>> clockWiseHalf = *new vector<vector<GLfloat>>(4, vector<GLfloat>(2, -1));
     
-    switch (i){
+    switch (index){
         case 0:{
             clockWiseHalf[0] = p->vertices[0];
             clockWiseHalf[1] = p->vertices[7];
@@ -942,7 +942,7 @@ vector<vector<GLfloat>> extractCounterClockWiseHalf(int i,
     
     vector<vector<GLfloat>> counterClockWiseHalf = *new vector<vector<GLfloat>>(4, vector<GLfloat>(2, -1));
     
-    switch (i){
+    switch (index){
         case 0:{
             counterClockWiseHalf[0] = p->vertices[1];
             counterClockWiseHalf[1] = p->vertices[2];
@@ -1120,31 +1120,32 @@ void extractCurveControlPoint(int startIndex,
         if(startIndex - endIndex > 4){
             //put the intersection of the clockWiseHalf of start and the counterClockWiseHalf of end into curve1
             for(int i = 0; i < 4; i++){
+                curve1->push_back(startClockWiseHalf[i]);
+            }
+            for(int i = 3; i >= 0; i--){
+                if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
+                    curve1->push_back(endCounterClockWiseHalf[i]);
+                }
+            }
+            //put the union of the counterClockWiseHalf of start and the clockWiseHalf of end into curve2
+            for(int i = 0; i < 4; i++){
+                if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
+                    curve2->push_back(startCounterClockWiseHalf[i]);
+                }
+            }
+            
+        }else{
+            for(int i = 0; i < 4; i++){
                 if(contains(startClockWiseHalf[i], endCounterClockWiseHalf)){
                     curve1->push_back(startClockWiseHalf[i]);
                 }
             }
-            //put the union of the counterClockWiseHalf of start and the clockWiseHalf of end into curve2
             for(int i = 0; i < 4; i++){
                 curve2->push_back(startCounterClockWiseHalf[i]);
             }
             for(int i = 3; i >= 0; i--){
                 if(!contains(endClockWiseHalf[i], startCounterClockWiseHalf)){
                     curve2->push_back(endClockWiseHalf[i]);
-                }
-            }
-        }else{
-            for(int i = 0; i < 4; i++){
-                if(contains(startCounterClockWiseHalf[i], endClockWiseHalf)){
-                    curve2->push_back(startCounterClockWiseHalf[i]);
-                }
-            }
-            for(int i = 0; i < 4; i++){
-                curve1->push_back(startClockWiseHalf[i]);
-            }
-            for(int i = 3; i >= 0; i--){
-                if(!contains(endCounterClockWiseHalf[i], startClockWiseHalf)){
-                    curve1->push_back(endCounterClockWiseHalf[i]);
                 }
             }
         }

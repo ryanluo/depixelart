@@ -144,13 +144,11 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> points) {
         knots[i] = i;
     }
     
-    if (startPoint<0 || startPoint+2>=numPoints)
-        return;
     
     /*  approximate the curve by a line strip through sample points	*/
-    glEnable(GL_LINE_WIDTH);
     glLineWidth(30.f);
     glPointSize(5);
+    glColor3f(1,0,0);
     glBegin(GL_POINTS);
     float numSamples=1000.;
     float t=0;
@@ -198,9 +196,10 @@ void display ()
         for (int i = 0; i < currentImageGraph->size(); ++i)
             currentImageGraph->at(i).glDrawPolygonWrapper();
         if (curveVector) {
-            for (int i = 0; i < curveVector->size(); ++i) {
-                drawCurve(0, curveVector->at(i));
-            }
+            //for (int i = 0; i < curveVector->size(); ++i) {
+                //drawCurve(0, curveVector->at(i));
+            //}
+            drawCurve(0, curveVector->at(37));
         }
     }
     else if (currentImage)
