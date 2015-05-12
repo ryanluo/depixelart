@@ -18,7 +18,7 @@ Image* currentImage  = NULL;
 Image* originalImage = NULL;
 ImageGraph* currentImageGraph = NULL;
 vector<vector<bool>>* similarityGraph = NULL;
-vector<vector<vector<GLfloat>>> * curveVector = NULL;
+vector<Curve> * curveVector = NULL;
 
 bool quietMode = false;
 bool textMode  = false;
@@ -217,7 +217,7 @@ void display ()
             currentImageGraph->at(i).glDrawPolygonWrapper();
         if (curveVector) {
             for (int i = 0; i < curveVector->size(); ++i) {
-                drawCurve(0, curveVector->at(i));
+                drawCurve(0, curveVector->at(i).verticies);
             }
         }
     }

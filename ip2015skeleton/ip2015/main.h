@@ -19,7 +19,7 @@ extern Image* currentImage;
 extern Image* originalImage;
 extern ImageGraph* currentImageGraph;
 extern vector<vector<bool>>* similarityGraph;
-extern vector<vector<vector<GLfloat>>> * curveVector;
+extern vector<Curve> * curveVector;
 
 extern bool quietMode;
 extern bool textMode;
