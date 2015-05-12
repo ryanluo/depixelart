@@ -1023,7 +1023,7 @@ Curve::Curve(){
 
 }
 
-Curve::Curve(vector<vector <GLfloat>> verticies) {
+Curve::Curve(vector<vector <GLfloat>> verticies, GLfloat color[4]) {
     verticies = verticies;
-    
+    for (int i = 0; i < 4; ++i) this->color[i] = color[i];
 }

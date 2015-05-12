@@ -157,9 +157,9 @@ typedef vector<ImagePixel> ImageGraph;
 class Curve {
 public:
     Curve();
-    Curve(vector<vector<GLfloat>> verticies);
+    ~Curve();
+    Curve(vector<vector<GLfloat>> verticies, GLfloat color[4]);
     vector<vector<GLfloat>> verticies;
-    vector<GLfloat> vectorColor;
     GLfloat color[4];
 };
 
