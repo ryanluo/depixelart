@@ -143,13 +143,14 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     for (int i = 0; i < numPoints + 2; ++i) {
         knots[i] = i;
     }
-    if (points.size() < 1) return;
+    if (points.size() < 2) return;
+    points.push_back(points[points.size()-1]);
     /*  approximate the curve by a line strip through sample points	*/
     //glEnable(GL_LINE_WIDTH);
     glLineWidth(3.f);
     glPointSize(5);
     glPushMatrix();
-    
+    glColor3f(0,1,0);
     glBegin(GL_POINTS);
     for (int i = 0; i < points.size(); ++i) {
         GLfloat poly[2] = { points[i][0], points[i][1]};

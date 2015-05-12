@@ -149,8 +149,6 @@ public:
     ~ImagePixel ();
     vector<vector<GLfloat>> vertices;
     Pixel p;
-
-private:
     GLfloat color[4];
 };
 
@@ -160,13 +158,9 @@ class Curve {
 public:
     Curve();
     Curve(vector<vector<GLfloat>> verticies);
-    const GLfloat basis[3][3] = {
-        {1,1,0},
-        {-2,2,0},
-        {1,-2,1}
-    };
-    GLfloat coeffs[3][3];
     vector<vector<GLfloat>> verticies;
+    vector<GLfloat> vectorColor;
+    GLfloat color[4];
 };
 
 #endif // IMAGE_H
