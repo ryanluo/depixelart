@@ -137,44 +137,56 @@ float N (int i, int k, float t, vector<int>& knots) {
     ((float) i + k - t + 1)/((float) k) * N(i+1, k-1, t, knots);
 }
 
-void drawCurve(int startPoint, vector<vector<GLfloat>> points) {
+void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     long numPoints = points.size();
     vector<int> knots(numPoints + 2);
     for (int i = 0; i < numPoints + 2; ++i) {
         knots[i] = i;
     }
-    
-    if (startPoint<0 || startPoint+2>=numPoints)
-        return;
-    
+    if (points.size() < 1) return;
     /*  approximate the curve by a line strip through sample points	*/
-    glEnable(GL_LINE_WIDTH);
+    //glEnable(GL_LINE_WIDTH);
     glLineWidth(30.f);
     glPointSize(5);
-    glBegin(GL_POINTS);
-    float numSamples=1000.;
+    glPushMatrix();
+    GLfloat translate[2] = {points[0][0], points[0][1]};
+    glTranslatef(translate[0], translate[1], 0.);
+    
+
+    glBegin(GL_LINE_STRIP);
+    float numSamples=100.;
     float t=0;
-    for (int i = 0; i < points.size(); ++i) {
-        GLfloat poly[2] = { points[i][0], points[i][1]};
-        glVertex3f(points[i][0], points[i][1], 0);
-    }
-    /*
+    
+//    for (int i = 0; i < points.size(); ++i) {
+//        GLfloat poly[2] = { points[i][0], points[i][1]};
+//        glVertex3f(points[i][0], points[i][1], 0);
+//    }
+    
+    // move to origin, translate later.
+    for (int i = 0; i < numPoints; ++i)
+        for (int k = 0; k < 2; ++k) points[i][k] -= translate[k];
+    
+    
     while (t < numPoints) {
         float polyVal[3] = {0., 0., 0.};
         for (int i = 0; i < numPoints; ++i) {
-            for (int k = 0; k < 3; ++k) polyVal[k] += N(i, 3, t, knots) * points[i][k];
+            for (int k = 0; k < 2; ++k) polyVal[k] += N(i, 2, t, knots) * points[i][k];
         }
         glVertex3fv(polyVal);
         t += ((float) numPoints)/numSamples;
     }
-    */
+    
     
     /* the curve ends at a control point when t=1  				*/
     /* because the increment 1.0/numSamples  has finite precision	*/
     /* t probably won't hit 1.0 exactly, so we force it			*/
     
     glEnd();
-    glDisable(GL_POINTS);
+    //glDisable(GL_LINE_WIDTH);
+    glPopMatrix();
+    
+    for (int i = 0; i < numPoints; ++i)
+        for (int k = 0; k < 2; ++k) points[i][k] += translate[k];
 }
 
 void display ()
@@ -198,7 +210,7 @@ void display ()
         for (int i = 0; i < currentImageGraph->size(); ++i)
             currentImageGraph->at(i).glDrawPolygonWrapper();
         if (curveVector) {
-            for (int i = 0; i < curveVector->size(); ++i) {
+            for (int i = 0; i < 10; ++i) { //curveVector->size(); ++i) {
                 drawCurve(0, curveVector->at(i));
             }
         }
