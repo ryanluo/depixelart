@@ -159,6 +159,7 @@ public:
     Curve();
     ~Curve();
     Curve(vector<vector<GLfloat>> verticies, GLfloat color[4]);
+    void setColor(GLfloat color[4]);
     vector<vector<GLfloat>> verticies;
     GLfloat color[4];
 };
