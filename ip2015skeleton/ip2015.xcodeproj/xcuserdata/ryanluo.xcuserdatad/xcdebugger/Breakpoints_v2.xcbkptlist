@@ -109,7 +109,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "695"
             endingLineNumber = "695"
-            landmarkName = "reshapePixelGl(int i, int j, vector&lt;bool&gt; adjList, ImageGraph* src, int blockSizeX, int blockSizeY, int pixelSize)"
+            landmarkName = "reshapePixels(vector&lt; vector&lt;bool&gt; &gt; &amp;similarityGraph, Image&amp; src, int blockSizeX, int blockSizeY, int pixelSize)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -120,11 +120,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ip2015/main.cpp"
-            timestampString = "453095527.649995"
+            timestampString = "453105004.392998"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "197"
-            endingLineNumber = "197"
+            startingLineNumber = "209"
+            endingLineNumber = "209"
             landmarkName = "display ()"
             landmarkType = "7">
          </BreakpointContent>
@@ -143,6 +143,22 @@
             endingLineNumber = "1010"
             landmarkName = "ImagePixel::glDrawPolygonWrapper ()"
             landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ip2015/main.cpp"
+            timestampString = "453105004.392998"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "151"
+            endingLineNumber = "151"
+            landmarkName = "drawCurve(int startPoint, vector&lt;vector&lt;GLfloat&gt;&gt; &amp; points)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
