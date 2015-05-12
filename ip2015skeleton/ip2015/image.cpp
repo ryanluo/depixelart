@@ -1020,7 +1020,7 @@ void ImagePixel::glDrawPolygonWrapper ()
 }
 
 Curve::Curve(){
-
+    verticies = vector<vector <GLfloat>>();
 }
 
 Curve::Curve(vector<vector <GLfloat>> verticies, GLfloat color[4]) {
