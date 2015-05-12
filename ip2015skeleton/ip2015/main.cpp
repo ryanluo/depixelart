@@ -156,12 +156,12 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     glBegin(GL_LINE_STRIP);
     float numSamples=100.;
     float t=0;
-    
-//    for (int i = 0; i < points.size(); ++i) {
-//        GLfloat poly[2] = { points[i][0], points[i][1]};
-//        glVertex3f(points[i][0], points[i][1], 0);
-//    }
-    
+    /*
+    for (int i = 0; i < points.size(); ++i) {
+        GLfloat poly[2] = { points[i][0], points[i][1]};
+        glVertex3f(points[i][0], points[i][1], 0);
+    }
+    */
     // move to origin, translate later.
     for (int i = 0; i < numPoints; ++i)
         for (int k = 0; k < 2; ++k) points[i][k] -= translate[k];
@@ -210,7 +210,7 @@ void display ()
         for (int i = 0; i < currentImageGraph->size(); ++i)
             currentImageGraph->at(i).glDrawPolygonWrapper();
         if (curveVector) {
-            for (int i = 0; i < 10; ++i) { //curveVector->size(); ++i) {
+            for (int i = 0; i < curveVector->size(); ++i) {
                 drawCurve(0, curveVector->at(i));
             }
         }
