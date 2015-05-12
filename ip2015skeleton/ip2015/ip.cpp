@@ -1093,6 +1093,11 @@ void extractCurveControlPoint(int startIndex,
                               vector<vector<GLfloat>>* curve1,
                               vector<vector<GLfloat>>* curve2,
                               vector<vector<bool>>* clockWiseGraph){
+    
+    if(i==17&&j==0){
+        cout<<"at 17"<<endl;
+    }
+    
     //get the end index
     int endIndex = -1;
     for(int x = 0; x < 8; x++){
@@ -1247,8 +1252,6 @@ int startOfCurve(int i, int j, int blockSizeX, int blockSizeY, vector<vector<boo
                 }
             }
         }
-        cout<<"first"<<firstIndex<<endl;
-        cout<<"second"<<secondIndex<<endl;
         int firstConnectedIndex = getClockWiseNeighborIndex(firstIndex, i, j, blockSizeY, blockSizeX);
         int secondConnectedIndex = getClockWiseNeighborIndex(secondIndex, i, j, blockSizeY, blockSizeX);
         if(getClockWiseNodeDegree(clockWiseGraph->at(firstConnectedIndex))!= 2){
@@ -1271,9 +1274,7 @@ vector< vector< vector< GLfloat >>> extractControlPoints(vector<vector<bool>>* s
     for(int i = 0; i<blockSizeX; i++){
         for(int j = 0; j<blockSizeY; j++){
             if(!clockWiseGraph[i*blockSizeY+j][8]){
-                cout<<"not visited"<<endl;
                 if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==1){
-                    cout<<"in curve"<<endl;
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, true);
                     curves.push_back(currentCurves[0]);
                     curves.push_back(currentCurves[1]);
