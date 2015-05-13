@@ -61,6 +61,7 @@ Image* ip_color_shift(Image* src)
  * use a mask image for a per-pixel alpha value to perform
  * interpolation with a second image
  */
+
 Image* ip_composite (Image* src1, Image* src2,
                      Image* mask)
 {
@@ -703,7 +704,6 @@ void reshapePixelGl(int i,
                     int pixelSize){
 
     ImagePixel* p = &currentImageGraph->at(i*blockSizeY+j);
-    //cout << &(p->vertices) << endl;
 
     ImagePixel* T;
     ImagePixel* TL;
@@ -715,7 +715,6 @@ void reshapePixelGl(int i,
         TL = &(*src)[(i-1)*blockSizeY + (j-1)];
         T = &(*src)[i*blockSizeY + (j-1)];
         L = &(*src)[(i-1)*blockSizeY + j];
-        // cout << p->vertices[0][0] << "," << p -> vertices[0][1] << endl;
 
         p->vertices[0][0] += pixelSize/4;
         p->vertices[0][1] += pixelSize/4;
@@ -748,7 +747,6 @@ void reshapePixelGl(int i,
         p->vertices[6][1] -= 0.25*pixelSize;
         p->vertices[7][0] -= 0.25*pixelSize;
         p->vertices[7][1] += 0.25*pixelSize;
-//        
 
         T->vertices[4][0] -= 0.25*pixelSize;
         T->vertices[4][1] += 0.25*pixelSize;
@@ -766,8 +764,6 @@ void reshapePixelGl(int i,
         R->vertices[1][1] -= 0.25*pixelSize;
     }
     
-//
-//    ImagePixel TR = src[(i+1)*blockSizeY + (j-1)];
     
 }
 
@@ -808,24 +804,6 @@ vector<vector<bool>> simplifiedSimilarityGraph(vector<vector<bool>> &similarityG
                     simplifiedGraph[(i-1)*blockSizeY+j][4] = false;
                 }
             }
-//            if(simplifiedGraph[i*blockSizeY+j][4]){
-//                if(similarityGraph[i*blockSizeY+j][1] && similarityGraph[i*blockSizeX+j][6]){
-//                    simplifiedGraph[i*blockSizeY+j][4] = false;
-//                    simplifiedGraph[(i+1)*blockSizeY+j][3] = false;
-//                }else if(similarityGraph[(i+1)*blockSizeY+j][1] && similarityGraph[(i+1)*blockSizeX+j][6]){
-//                    simplifiedGraph[i*blockSizeY+j][4] = false;
-//                    simplifiedGraph[(i+1)*blockSizeY+j][3] = false;
-//                }
-//            }
-//            if(simplifiedGraph[i*blockSizeY+j][6]){
-//                if(similarityGraph[i*blockSizeY+j][3] && similarityGraph[i*blockSizeX+j][4]){
-//                    simplifiedGraph[i*blockSizeY+j][6] = false;
-//                    simplifiedGraph[i*blockSizeY+j+1][1] = false;
-//                }else if(similarityGraph[i*blockSizeY+j+1][3] && similarityGraph[i*blockSizeX+j+1][4]){
-//                    simplifiedGraph[i*blockSizeY+j][6] = false;
-//                    simplifiedGraph[i*blockSizeY+j+1][1] = false;
-//                }
-//            }
         }
     }
     return simplifiedGraph;
@@ -1364,12 +1342,7 @@ void extractControlPoints(vector<vector<bool>>* simplifiedGraph,
                                                      int blockSizeX,
                                                      int blockSizeY){
     vector<vector<bool>> clockWiseGraph = clockWiseSimplifiedGraph(*simplifiedGraph, blockSizeX, blockSizeY);
-    //vector<vector<vector<GLfloat >>> curves = *new vector<vector<vector<GLfloat >>>();
-    
-    //vector<>
-    
-    //vector<vector<vector<GLfloat>>> currentCurves;
-    
+
     curveVector = new vector<Curve>();
     
     vector<Curve> currentCurves;
@@ -1380,7 +1353,7 @@ void extractControlPoints(vector<vector<bool>>* simplifiedGraph,
                 if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==1){
                     currentCurves = extractCurveControlPointStartingAt(i, j, blockSizeX, blockSizeY, &clockWiseGraph, true);
                     //curves.push_back(currentCurves[0]);
-                    //curves.push_back(currentCurves[1]);
+                    //curves.push_back(currentCur
                     curveVector->push_back(currentCurves[0]);
                     curveVector->push_back(currentCurves[1]);
                 } else if(startOfCurve(i, j, blockSizeX, blockSizeY, &clockWiseGraph)==2){
@@ -1393,12 +1366,6 @@ void extractControlPoints(vector<vector<bool>>* simplifiedGraph,
             }
         }
     }
-    
-    
-
-    //
-    
-    //return curves;
 }
 
 
@@ -1415,11 +1382,7 @@ Image* ip_misc(Image* src,
                const int blockSizeY,
                const int pixelSize)
 {
-    //cerr << "This function is not implemented." << endl;
-//    const int blockSizeY = 16;
-//    const int blockSizeX = 40;
-//    const int pixelSize = 15;
-//
+    
     int srcWidth = src->getWidth();
     int srcHeight = src->getHeight();
     Image* rawGraph = new Image(blockSizeX, blockSizeY, 8);
@@ -1453,8 +1416,6 @@ Image* ip_misc(Image* src,
             
             currentImageGraph->at(i*blockSizeY+j).setPixel(outputPixel);
             rawGraph->setPixel(i, j, outputPixel);
-//            outputPixel = Pixel(0,0,0);
-//            rawGraph->setPixel(i, j, outputPixel);
             
         }
     }
@@ -1466,17 +1427,6 @@ Image* ip_misc(Image* src,
             checkNeighbors(i, j, *rawGraph, &similarityGraph->at(i*blockSizeY + j));
         }
     }
-    
-//    
-//    for (int i = 0; i < blockSizeX; ++i) {
-//        for (int j = 0; j < blockSizeY; ++j) {
-//            for (int k = 0; k < 8; ++k) cout << similarityGraph->at(i*blockSizeY + j)
-//                [k] << ",";
-//            cout << endl;
-//        }
-//    }
-//    
-//    
     
     
     Image* rawGraphTest = new Image(blockSizeX*pixelSize, blockSizeY*pixelSize, 3);
@@ -1512,45 +1462,24 @@ Image* ip_misc(Image* src,
     }
     
     reshapePixelsGl(*similarityGraph, currentImageGraph, blockSizeX, blockSizeY, pixelSize);
-//
-//    for(int i = 0; i<blockSizeX; ++i){
-//        for(int j = 0; j<blockSizeY; ++j){
-//            for(int k = 0; k<8; ++k){
-//                if(similarityGraph->at(i*blockSizeY+j)[k]){
-//                    int endX = i;
-//                    int endY = j;
-//                    getNeighbor(i, j, &endX, &endY, k);
-//                    if (similarityGraph->at(i*blockSizeY + j)[7] || similarityGraph->at(i*blockSizeY + j)[2] ||similarityGraph->at(i*blockSizeY + j)[0] || similarityGraph->at(i*blockSizeY + j)[5])
-//                        
-//                    
-//                    //reshapePixels(*similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
-//                     reshapePixelsGl(*similarityGraph, currentImageGraph, blockSizeX, blockSizeY, pixelSize);
-//                    //drawEdge(x, y, endX, endY, pixelSize, *rawGraphTest);
-//                }
-//            }
-//        }
-    
-//    }
-//
+
     vector<vector<bool>> simplifiedGraph = simplifiedSimilarityGraph(*similarityGraph, blockSizeX, blockSizeY);
     
     extractControlPoints(&simplifiedGraph, blockSizeX, blockSizeY);
-//    //vector<vector<bool>> simplifiedGraph = *similarityGraph;
     for(int i = 0; i<blockSizeX; ++i){
         for(int j = 0; j<blockSizeY; ++j){
             for(int k = 0; k<8; ++k){
                 if(simplifiedGraph[i*blockSizeY+j][k]){
                     int endX = i;
                     int endY = j;
+
                     getNeighbor(i, j, &endX, &endY, k);
-                    //reshapePixels(similarityGraph, *rawGraphTest, blockSizeX, blockSizeY, pixelSize);
                     drawEdge(i, j, endX, endY, pixelSize, *rawGraphTest);
                 }
             }
         }
         
     }
-    
     return rawGraphTest;
 }
 

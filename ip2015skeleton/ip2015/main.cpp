@@ -137,8 +137,10 @@ float N (int i, int k, float t, vector<int>& knots) {
     ((float) i + k - t + 1)/((float) k) * N(i+1, k-1, t, knots);
 }
 
-void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
+void drawCurve(int startPoint, Curve & curve) {
+    vector<vector<GLfloat>> points = curve.verticies;
     long numPoints = points.size();
+
     vector<int> knots(numPoints + 2);
     for (int i = 0; i < numPoints + 2; ++i) {
         knots[i] = i;
@@ -151,6 +153,7 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     glPointSize(5);
     glPushMatrix();
     glColor3f(0,1,0);
+    
     glBegin(GL_POINTS);
     for (int i = 0; i < points.size(); ++i) {
         GLfloat poly[2] = { points[i][0], points[i][1]};
@@ -158,10 +161,12 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     }
     glEnd();
     
+    
     GLfloat translate[2] = {points[0][0], points[0][1]};
     glTranslatef(translate[0], translate[1], 0.);
     
-    glColor3f(1, 0, 0);
+    glColor3f(1,0,0);
+    
     glBegin(GL_LINE_STRIP);
     float numSamples=100.;
     float t=0;
@@ -171,7 +176,7 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
     
     for (int i = 0; i < numPoints; ++i)
         for (int k = 0; k < 2; ++k) points[i][k] -= translate[k];
-    
+    /*
     
     while (t < numPoints) {
         float polyVal[3] = {0., 0., 0.};
@@ -180,7 +185,7 @@ void drawCurve(int startPoint, vector<vector<GLfloat>> & points) {
         }
         glVertex3fv(polyVal);
         t += ((float) numPoints)/numSamples;
-    }
+    }*/
     
     
     /* the curve ends at a control point when t=1  				*/
@@ -217,7 +222,7 @@ void display ()
             currentImageGraph->at(i).glDrawPolygonWrapper();
         if (curveVector) {
             for (int i = 0; i < curveVector->size(); ++i) {
-                drawCurve(0, curveVector->at(i).verticies);
+                drawCurve(0, curveVector->at(i));
             }
         }
     }
