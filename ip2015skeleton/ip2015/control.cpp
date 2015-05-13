@@ -60,44 +60,8 @@ int make_menu ()
 	glutAddMenuEntry( "Get Image Info",		M_FILE_INFO);
 	glutAddMenuEntry( "Revert",		M_FILE_REVERT);
 
-	int blur = glutCreateMenu(menu_func);
-	glutAddMenuEntry( "Box...",		M_PROCESS_BLUR_BOX);
-	glutAddMenuEntry( "Gaussian...",	M_PROCESS_BLUR_GAUSSIAN);
-	glutAddMenuEntry( "Triangle...",	M_PROCESS_BLUR_TRIANGLE);
-
-	int quantize = glutCreateMenu(menu_func);
-	glutAddMenuEntry( "Simple...",	M_PROCESS_QUANTIZE_SIMPLE);
-	glutAddMenuEntry( "Ordered...",	M_PROCESS_QUANTIZE_ORDERED);
-	glutAddMenuEntry( "Floyd-Steinberg...", M_PROCESS_QUANTIZE_FLOYD_STEINBERG);
-
-	int samplingMode = glutCreateMenu(menu_func);
-	glutAddMenuEntry("Bilinear sampling", M_PROCESS_SET_SAMPLING_BILINEAR);
-	glutAddMenuEntry("Nearest neighbor sampling", M_PROCESS_SET_SAMPLING_NEAREST);
-	glutAddMenuEntry("Gaussian resampling...", M_PROCESS_SET_SAMPLING_GAUSSIAN);
-
-	int warp = glutCreateMenu(menu_func);
-	glutAddMenuEntry( "Fun...",		M_PROCESS_FUN_WARP);
-	glutAddMenuEntry( "Image shift...",	M_PROCESS_IMAGE_SHIFT);
-	glutAddMenuEntry( "Rotate...",	M_PROCESS_ROTATE);
-	glutAddMenuEntry( "Scale...",	M_PROCESS_SCALE);
-	glutAddSubMenu( "Set Sampling Mode", samplingMode);
-
 	int process = glutCreateMenu(menu_func);
-	glutAddSubMenu(   "Blur",		blur);
-	glutAddMenuEntry( "Brighten...",	M_PROCESS_BRIGHTEN);
-	glutAddMenuEntry("Color shift", M_PROCESS_COLOR_SHIFT);
-	glutAddMenuEntry( "Composite...",	M_PROCESS_COMPOSITE);
-	glutAddMenuEntry( "Contrast...",	M_PROCESS_CONTRAST);
-	glutAddMenuEntry( "Crop...",		M_PROCESS_CROP);
-	glutAddMenuEntry( "Edge Detect",	M_PROCESS_EDGE_DETECT);
-	glutAddMenuEntry( "Extract...",	M_PROCESS_EXTRACT);
-	glutAddMenuEntry( "Grey",		M_PROCESS_GREY);
-	glutAddMenuEntry( "Invert",		M_PROCESS_INVERT);
 	glutAddMenuEntry( "Misc. effects...", M_PROCESS_MISC);
-	glutAddSubMenu(   "Quantize",		quantize);
-	glutAddMenuEntry( "Saturate...",	M_PROCESS_SATURATE);
-	glutAddMenuEntry( "Threshold...",	M_PROCESS_THRESHOLD);
-	glutAddSubMenu( "Warp", warp);
 
 
 
@@ -106,8 +70,6 @@ int make_menu ()
 	int main = glutCreateMenu(menu_func);
 	glutAddSubMenu(   "File",		file);
 	glutAddSubMenu(   "Process",		process);
-	glutAddMenuEntry( "View pixel value...", M_VIEW_PIXEL_VALUE);
-	glutAddMenuEntry( "Help",		M_HELP);
 	glutAddMenuEntry( "Quit",		M_QUIT);
 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -135,12 +97,6 @@ void menu_func (int value)
 	{
 	case M_QUIT:  // enum #0
 		exit(0);
-		break;
-
-
-
-	case M_HELP:  // enum #1
-		menu_help();
 		break;
 
 
@@ -220,256 +176,10 @@ void process_func (int value)
 
 	switch (value)
 	{
-	case M_PROCESS_BLUR_BOX:  // enum #6
-		{
-			int filterSize = getFilterSize();
-			if (filterSize>0)
-				resultImage = ip_blur_box(currentImage, filterSize);
-			break;
-		}
-
-
-	case M_PROCESS_BLUR_GAUSSIAN:  // enum #7
-		{
-			int filterSize = getFilterSize();
-			if (filterSize<=0)
-				break;
-			double sigma = getPositiveDouble("sigma");
-			if (sigma>0)
-				resultImage = ip_blur_gaussian(currentImage, filterSize, sigma);
-			break;
-		}
-
-
-	case M_PROCESS_BLUR_TRIANGLE:  // enum #8
-		{
-			int filterSize = getFilterSize();
-			if (filterSize>0)
-				resultImage = ip_blur_triangle(currentImage, filterSize);
-			break;
-		}
-
-
-	case M_PROCESS_BRIGHTEN:  // enum #9
-		{
-			double alpha = getDouble("alpha");
-			resultImage = ip_brighten(currentImage, alpha);
-			break;
-		}
-
-	case M_PROCESS_COLOR_SHIFT: // enum #10
-		resultImage=ip_color_shift(currentImage);
-		break;
-
-	case M_PROCESS_CONTRAST:  // enum #11
-		{
-			double alpha=getDouble("alpha");
-			resultImage = ip_contrast(currentImage, alpha);
-			break;
-		}
-
-
-	case M_PROCESS_COMPOSITE: // enum #12
-		{
-			char filename[MAX_NAME];
-			// we don't do a lot of checks here; i.e. second image and
-			// mask valid images and the same size as current image
-			if (!quietMode)
-				cerr << "Enter filename of second image (string - no spaces) : ";
-			cin  >> filename;
-			Image* secondImage = new Image();
-			secondImage->read(filename);
-			if (!quietMode)
-				cerr << "Enter filename of mask (string - no spaces) : ";
-			cin  >> filename;
-			Image* mask = new Image();
-			mask->read(filename);
-			checkStream(cin);
-			resultImage = ip_composite(currentImage, secondImage, mask);
-			delete secondImage;
-			delete mask;
-			break;
-		}
-
-
-	case M_PROCESS_CROP: // enum #13
-		{
-			int x0, y0, x1, y1;
-			if (!quietMode)
-			{
-				cerr << "Current image width and height: " << currentImage->getWidth()-1 << " " 
-					<< currentImage->getHeight()-1 << endl;
-				cerr << "Enter region to crop (left top right bottom (ints)) : ";
-			}
-			cin >> x0 >> y0 >> x1 >> y1;
-			checkStream(cin);
-			if (x0>=0 || x0<x1 || x1<currentImage->getWidth() || y0>=0 || y0<y1 || y1<currentImage->getHeight())
-			{
-				resultImage = ip_crop(currentImage, x0,y0,x1,y1);
-			}
-			else
-			{
-				cerr<< "Invalid region." << endl;
-			}
-
-			break;
-		}
-
-
-	case M_PROCESS_EDGE_DETECT: // enum #14
-		resultImage = ip_edge_detect(currentImage);
-		break;
-
-
-	case M_PROCESS_EXTRACT:  // enum #15
-		{
-			int channel = getInt("channel [0,2]");
-			if (channel<0 || channel>2) 
-			{
-				cerr << "Invalid channel."<< endl;
-			}
-			else
-			{
-				resultImage = ip_extract(currentImage, channel);
-			}
-			break;
-		}
-
-	case M_PROCESS_FUN_WARP:  // enum #16
-		//resultImage = ip_fun_warp(currentImage,samplingMode);
-		break;
-
-	case M_PROCESS_GREY: // enum #17
-		resultImage = ip_grey(currentImage);
-		break;
-
-	case M_PROCESS_IMAGE_SHIFT: // enum #18
-		{
-			double dx = getDouble("dx");
-			double dy = getDouble("dy");
-			resultImage = ip_image_shift(currentImage,dx, dy);
-			break;
-		}
-
-	case M_PROCESS_INVERT:  // enum #19
-		resultImage = ip_invert(currentImage);
-		break;
 
 	case M_PROCESS_MISC: // enum #20
 		resultImage = ip_misc(currentImage, currentImageGraph, similarityGraph, 40, 16, 20);
 		break;
-
-
-	case M_PROCESS_QUANTIZE_SIMPLE:  // enum #21
-		{
-
-			int bitsPerChannel = getInt("bits per channel [1,8]");
-			if (bitsPerChannel<=0 || bitsPerChannel>8)
-			{
-				cerr << "Invalid number bits." << endl;
-			}
-			else
-			{
-				resultImage = ip_quantize_simple(currentImage, bitsPerChannel);
-			}
-			break;
-		}
-
-
-	case M_PROCESS_QUANTIZE_ORDERED:  //enum #22
-		{
-			int bitsPerChannel = getInt("bits per channel [1,8]");
-
-			if (bitsPerChannel<=0 || bitsPerChannel>8)
-			{
-				cerr << "Invalid number bits." << endl;
-			}
-			else
-			{
-				resultImage = ip_quantize_ordered(currentImage, bitsPerChannel);
-			}
-			break;
-		}
-
-
-	case M_PROCESS_QUANTIZE_FLOYD_STEINBERG: // enum #23
-		{
-			int bitsPerChannel = getInt("bits per channel [1,8]");
-
-			if (bitsPerChannel<=0 || bitsPerChannel>8)
-			{
-				cerr << "Invalid number bits." << endl;
-			}
-			else
-			{
-				resultImage = ip_quantize_fs(currentImage, bitsPerChannel);
-			}
-			break;
-		}
-
-
-	case M_PROCESS_ROTATE: // enum #24
-		{
-			if (!quietMode) 
-			{
-				cerr<< "Current image width/height: " << currentImage->getWidth()-1 << " " 
-					<< currentImage->getHeight()-1 << endl;
-			}
-			double theta = getDouble("angle");
-			double x = getDouble("point x");
-			double y = getDouble("point y");
-			resultImage = ip_rotate(currentImage, theta, x, y, samplingMode, 
-				gaussianFilterSize, gaussianSigma);
-			break;
-		}
-
-
-	case M_PROCESS_SATURATE:  // enum #25
-		{
-			double alpha = getDouble("alpha");
-			resultImage = ip_saturate(currentImage, alpha);
-			break;
-		}
-
-
-	case M_PROCESS_SCALE: // enum #26
-		{
-			double xFactor = getDouble("scale factor for x");
-			double yFactor = getDouble("scale factor for y");
-			resultImage = ip_scale(currentImage, xFactor, yFactor, samplingMode, gaussianFilterSize, gaussianSigma);
-			break;
-		}
-
-	case M_PROCESS_SET_SAMPLING_BILINEAR: // enum #27
-		samplingMode=I_BILINEAR;
-		break;
-
-	case M_PROCESS_SET_SAMPLING_NEAREST:  // enum #28
-		samplingMode=I_NEAREST;
-		break;
-
-	case M_PROCESS_SET_SAMPLING_GAUSSIAN: // enum #29
-		gaussianFilterSize=getInt("filter size (positive, even integer)");
-		if (gaussianFilterSize%2!=0 || gaussianFilterSize<=0)
-		{
-			gaussianFilterSize=3;
-			cerr<<"Invalid value, using default size of 3"<<endl;
-		}
-		gaussianSigma=getDouble("sigma (non-negative)");
-		if (gaussianSigma <0) 
-		{
-			gaussianSigma=1;
-			cerr<<"Invalid value, using default sigma of 1"<<endl;
-		}
-		samplingMode=I_GAUSSIAN;
-        break;
-
-	case M_PROCESS_THRESHOLD: // enum #23
-		{
-			double threshold=getDouble("threshold [0,1]");
-			resultImage = ip_threshold(currentImage, threshold);
-			break;
-		}
 
 
 	default:
